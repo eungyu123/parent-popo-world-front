@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
+import { useAuthStore } from "../zustand/auth";
 
 /**
  * API 에러를 처리하기 위한 커스텀 에러 클래스
@@ -37,7 +38,7 @@ apiClient.interceptors.request.use(
   (config) => {
     // 1. 인증 토큰 처리
     // 쿠키에서 토큰을 가져와서 Authorization 헤더에 추가
-    const token = Cookies.get("accessToken");
+    const token = useAuthStore.getState().accessToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -91,12 +92,12 @@ apiClient.interceptors.response.use(
         if (refreshToken) {
           // 리프레시 토큰으로 새로운 액세스 토큰 요청
           return apiClient
-            .post("/auth/refresh", { refreshToken })
+            .post("/auth/token/refresh", { refreshToken })
             .then((response) => {
               const newAccessToken = response.headers["authorization"];
               if (newAccessToken) {
                 const token = newAccessToken.replace("Bearer ", "");
-                Cookies.set("token", token);
+                useAuthStore.getState().setAccessToken(token);
                 // 원래 요청 재시도
                 const originalRequest = error.config;
                 if (originalRequest) {
@@ -108,14 +109,12 @@ apiClient.interceptors.response.use(
             })
             .catch(() => {
               // 리프레시 토큰도 만료된 경우 로그아웃 처리
-              Cookies.remove("token");
               Cookies.remove("refreshToken");
               window.location.href = "/auth/sign-in";
               return Promise.reject(new ApiError(401, "인증이 필요합니다."));
             });
         }
         // 리프레시 토큰이 없는 경우 로그아웃
-        Cookies.remove("token");
         Cookies.remove("refreshToken");
         window.location.href = "/auth/sign-in";
         return Promise.reject(new ApiError(status, "인증이 필요합니다."));

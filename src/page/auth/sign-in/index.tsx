@@ -15,7 +15,7 @@ interface SignInForm {
 
 export function SignInPage() {
   const navigate = useNavigate();
-  const { setUser } = useAuthStore();
+  const { setUser, setAccessToken, setChildren } = useAuthStore();
   const [formData, setFormData] = useState<SignInForm>({
     email: "",
     password: "",
@@ -37,14 +37,8 @@ export function SignInPage() {
 
       // 액세스 토큰 저장
       const accessToken = response.headers["authorization"]?.replace("Bearer ", "");
-      if (accessToken) {
-        Cookies.set("accessToken", accessToken, {
-          expires: 1, // 1일 후 만료
-          secure: true,
-          sameSite: "strict", // CSRF 공격 방지
-        });
-      }
-
+      setAccessToken(accessToken);
+      setChildren(response.data.children);
       // 리프레시 토큰 저장
       const refreshToken = response.headers["refresh-token"];
       if (refreshToken) {

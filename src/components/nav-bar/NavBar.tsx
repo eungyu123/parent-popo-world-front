@@ -31,16 +31,16 @@ export const NavBar: React.FC = () => {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 mx-auto max-w-md mb-8 transition-transform duration-300 ${
+      className={`fixed bottom-0 left-0 right-0 mx-auto max-w-md mb-4 transition-transform duration-300 ${
         isVisible ? "translate-y-0" : "translate-y-[200%]"
       }`}
     >
-      <div className="flex justify-between bg-black/20 rounded-full w-[calc(100%-4rem)] mx-auto px-8 py-3">
-        <img src={gray_back} alt="" className="w-8 h-8 object-contain" />
-        <img src={gray_home} alt="" className="w-8 h-8 object-contain" />
-        <img src={gray_chart} alt="" className="w-8 h-8 object-contain" />
-        <img src={gray_store} alt="" className="w-8 h-8 object-contain" />
-        <img src={gray_setup} alt="" className="w-8 h-8 object-contain" />
+      <div className="flex justify-between bg-black/20 rounded-2xl w-[calc(100%-4rem)] mx-auto px-8 py-3">
+        <img src={gray_back} alt="" className="w-6 h-6 object-contain" />
+        <img src={gray_home} alt="" className="w-6 h-6 object-contain" />
+        <img src={gray_chart} alt="" className="w-6 h-6 object-contain" />
+        <img src={gray_store} alt="" className="w-6 h-6 object-contain" />
+        <img src={gray_setup} alt="" className="w-6 h-6 object-contain" />
       </div>
     </div>
   );

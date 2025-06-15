@@ -7,30 +7,31 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-/**
- * 인증 상태의 타입 정의
- * @property {boolean} isAuthenticated - 사용자의 인증 여부
- * @property {Object|null} user - 사용자 정보 (인증되지 않은 경우 null)
- * @property {string} user.name - 사용자 이름
- */
+interface Child {
+  name: string;
+  sex: string;
+  point: number;
+  age: number;
+  email: string;
+  userId: string;
+  createdAt: string;
+}
 interface AuthState {
   isAuthenticated: boolean; // 인증 여부
   user: {
     name: string; // 이름
     parentCode: string; // 부모 코드
   } | null;
+  child: Child[];
   parentCode: string | null;
+  accessToken: string | null; // GitHub access token
 }
 
-/**
- * 인증 스토어의 전체 타입 정의
- * AuthState를 확장하여 액션 메서드들을 포함
- * @property {Function} setUser - 사용자 정보를 설정하는 함수
- * @property {Function} logout - 로그아웃 처리를 하는 함수
- */
 interface AuthStore extends AuthState {
   setUser: (user: AuthState["user"]) => void; // 유저 정보 설정
   logout: () => void; // 로그아웃
+  setChildren: (child: Child[]) => void; // Child 설정
+  setAccessToken: (token: string) => void; // Access Token 설정
 }
 
 /**
@@ -41,6 +42,8 @@ const INITIAL_AUTH_STATE: AuthState = {
   isAuthenticated: false,
   user: null,
   parentCode: null,
+  accessToken: null,
+  child: [],
 };
 
 /**
@@ -61,15 +64,20 @@ export const useAuthStore = create<AuthStore>()(
         }),
       // 로그아웃 액션
       logout: () => set(INITIAL_AUTH_STATE),
+      // Access Token 설정 액션
+      setAccessToken: (token: string) => set({ accessToken: token }),
+      // Child 설정 액션
+      setChildren: (child: Child[]) => set({ child }),
     }),
     {
       name: "auth-storage", // localStorage에 저장될 키 이름
       storage: createJSONStorage(() => localStorage), // localStorage를 스토리지로 사용
       partialize: (state) => ({
-        // 저장할 상태 필드 지정
         isAuthenticated: state.isAuthenticated,
         user: state.user,
         parentCode: state.parentCode,
+        accessToken: state.accessToken,
+        child: state.child,
       }),
     }
   )

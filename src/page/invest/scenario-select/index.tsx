@@ -66,10 +66,10 @@ export const InvestScenarioSelectPage: React.FC = () => {
     size: 0,
     number: 0,
   });
-  console.log(scenarioList);
+
   useEffect(() => {
     getScenarioList(currentPage, 5).then((data) => {
-      console.log(data);
+      console.log("data", data);
       setScenarioList(data);
     });
   }, [currentPage]);
