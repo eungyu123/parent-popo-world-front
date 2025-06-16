@@ -1,10 +1,16 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
 export const ScenarioCreateModal = ({
+  scenarioId,
   selectedTheme,
   setSenarioCreateModalOpen,
 }: {
+  scenarioId: string;
   selectedTheme: string;
   setSenarioCreateModalOpen: (open: boolean) => void;
 }) => {
+  const [scenario, setScenario] = useState("");
   return (
     <div className="flex flex-col gap-y-4 bg-white rounded-lg p-6 w-[320px]" onClick={(e) => e.stopPropagation()}>
       <div className="text-sm font-bold">시나리오 생성</div>
@@ -17,6 +23,8 @@ export const ScenarioCreateModal = ({
       <div className="flex flex-col gap-y-2">
         <div className="text-xs text-gray-900">시나리오 이름</div>
         <input
+          value={scenario}
+          onChange={(e) => setScenario(e.target.value)}
           type="text"
           placeholder="시나리오 이름을 입력하세요"
           className="px-3 py-2 border border-gray-300 rounded text-xs focus:outline-none focus:border-gray-900"
@@ -24,15 +32,12 @@ export const ScenarioCreateModal = ({
       </div>
 
       <div className="flex gap-x-2 mt-2 justify-end">
-        <button
-          onClick={() => {
-            // TODO: 시나리오 생성 로직
-            setSenarioCreateModalOpen(false);
-          }}
-          className=" px-4 py-2 text-xs text-white bg-gray-900 rounded hover:bg-gray-800"
+        <Link
+          to={`/invest/chat-bot?scenarioType=${selectedTheme}&scenarioName=${scenario}&scenarioId=${scenarioId}`}
+          className="px-4 py-2 text-xs text-white bg-gray-900 rounded hover:bg-gray-800"
         >
           생성
-        </button>
+        </Link>
         <button
           onClick={() => setSenarioCreateModalOpen(false)}
           className=" px-4 py-2 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200"

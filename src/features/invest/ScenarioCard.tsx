@@ -3,6 +3,8 @@ import { DropdownMenu } from "./DropdownMenu";
 
 export const ScenarioCard = ({
   name,
+  id,
+  updatedAt,
   buttonColor,
   handleDropdownToggle,
   handleEdit,
@@ -11,11 +13,13 @@ export const ScenarioCard = ({
   openDropdowns,
 }: {
   name: string;
+  id: string;
   buttonColor: string;
-  handleDropdownToggle: (name: string) => void;
-  handleEdit: (name: string) => void;
-  handleView: (name: string) => void;
-  handleDelete: (name: string) => void;
+  updatedAt: string;
+  handleDropdownToggle: (id: string) => void;
+  handleEdit: (id: string) => void;
+  handleView: (id: string) => void;
+  handleDelete: (id: string) => void;
   openDropdowns: Record<string, boolean>;
 }) => {
   return (
@@ -32,11 +36,11 @@ export const ScenarioCard = ({
             <EditIcon />
           </button>
           <DropdownMenu
-            isOpen={openDropdowns[name] || false}
-            onClose={() => handleDropdownToggle(name)}
-            onView={() => handleView(name)}
-            onEdit={() => handleEdit(name)}
-            onDelete={() => handleDelete(name)}
+            isOpen={openDropdowns[id] || false}
+            onClose={() => handleDropdownToggle(id)}
+            onView={() => handleView(id)}
+            onEdit={() => handleEdit(id)}
+            onDelete={() => handleDelete(id)}
           />
         </div>
       </div>
@@ -50,7 +54,7 @@ export const ScenarioCard = ({
           <div className="text-[0.7rem] bg-gray-100 text-gray-500 p-1 rounded-sm">#태그</div>
           <div className="text-[0.7rem] bg-gray-100 text-gray-500 p-1 rounded-sm">#태그</div>
         </div>
-        <div className="text-[0.7rem] text-gray-500">2025.05.20</div>
+        <div className="text-[0.7rem] text-gray-500">{updatedAt}</div>
       </div>
     </div>
   );

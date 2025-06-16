@@ -2,7 +2,7 @@
  * 인증 관련 상태 관리를 위한 Zustand 스토어
  *
  * 이 스토어는 사용자의 인증 상태와 사용자 정보를 관리합니다.
- * localStorage를 사용하여 브라우저를 새로고침해도 상태가 유지됩니다.
+ * localStorage에는 필요한 정보만 저장하고, 민감한 정보는 메모리에만 유지합니다.
  */
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
@@ -16,6 +16,7 @@ interface Child {
   userId: string;
   createdAt: string;
 }
+
 interface AuthState {
   isAuthenticated: boolean; // 인증 여부
   user: {
@@ -25,6 +26,7 @@ interface AuthState {
   child: Child[];
   parentCode: string | null;
   accessToken: string | null; // GitHub access token
+  selectedChildId: string | null; // 선택된 자녀 ID
 }
 
 interface AuthStore extends AuthState {
@@ -32,6 +34,7 @@ interface AuthStore extends AuthState {
   logout: () => void; // 로그아웃
   setChildren: (child: Child[]) => void; // Child 설정
   setAccessToken: (token: string) => void; // Access Token 설정
+  setSelectedChildId: (childId: string) => void; // 선택된 자녀 설정
 }
 
 /**
@@ -44,6 +47,7 @@ const INITIAL_AUTH_STATE: AuthState = {
   parentCode: null,
   accessToken: null,
   child: [],
+  selectedChildId: null,
 };
 
 /**
@@ -67,7 +71,14 @@ export const useAuthStore = create<AuthStore>()(
       // Access Token 설정 액션
       setAccessToken: (token: string) => set({ accessToken: token }),
       // Child 설정 액션
-      setChildren: (child: Child[]) => set({ child }),
+      setChildren: (child: Child[]) => {
+        set((state) => ({
+          child,
+          // 자녀 목록이 변경될 때 선택된 자녀가 없으면 첫 번째 자녀를 선택
+          selectedChildId: state.selectedChildId || (child.length > 0 ? child[0].userId : null),
+        }));
+      },
+      setSelectedChildId: (childId: string) => set({ selectedChildId: childId }),
     }),
     {
       name: "auth-storage", // localStorage에 저장될 키 이름
@@ -78,6 +89,7 @@ export const useAuthStore = create<AuthStore>()(
         parentCode: state.parentCode,
         accessToken: state.accessToken,
         child: state.child,
+        selectedChildId: state.selectedChildId,
       }),
     }
   )

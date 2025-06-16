@@ -40,6 +40,7 @@ apiClient.interceptors.request.use(
     // 쿠키에서 토큰을 가져와서 Authorization 헤더에 추가
     const token = useAuthStore.getState().accessToken;
     if (token) {
+      console.log("token", token);
       config.headers.Authorization = `Bearer ${token}`;
     }
 

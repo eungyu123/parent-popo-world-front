@@ -11,13 +11,9 @@ export interface ScenarioItem {
   updatedAt: string;
 }
 
-// 페이지네이션 응답 타입 정의
-export interface PaginatedResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
+interface ScenarioList {
+  scenarioList: ScenarioItem[];
+  totalPageSize: string;
 }
 
 /**
@@ -27,13 +23,12 @@ export interface PaginatedResponse<T> {
  * @returns 페이지네이션된 시나리오 목록
  * @throws ApiError 네트워크 에러, 인증 에러, 서버 에러 등
  */
-export const getScenarioList = async (page: number, size: number): Promise<PaginatedResponse<ScenarioItem>> => {
+export const getScenarioList = async (page: number, size: number, childId: string): Promise<ScenarioList> => {
   try {
-    const response = await apiClient.get<PaginatedResponse<ScenarioItem>>("/api/chatbot/items", {
-      params: {
-        page,
-        size,
-      },
+    const response = await apiClient.post<ScenarioList>("/api/chatbot/items", {
+      page,
+      size,
+      childId,
     });
     return response.data;
   } catch (error) {

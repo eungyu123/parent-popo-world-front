@@ -1,26 +1,29 @@
+import { useAuthStore } from "../../zustand/auth";
+
 interface ChildNavBarProps {
   selectedColor: string;
-  selectedChild: string;
-  setSelectedChild: (child: string) => void;
 }
 
-export const ChildNavBar: React.FC<ChildNavBarProps> = ({ selectedColor, selectedChild, setSelectedChild }) => {
+export const ChildNavBar: React.FC<ChildNavBarProps> = ({ selectedColor }) => {
+  const { child, selectedChildId, setSelectedChildId } = useAuthStore();
+
   return (
     <div className="flex justify-between mb-8  bg-gray-100 rounded-xl p-1">
-      {["자녀 1", "자녀 2"].map((child) => (
-        <button
-          key={child}
-          className={`flex-1 py-1 rounded-xl text-sm font-semibold transition ${
-            selectedChild === child ? "bg-white shadow " : ""
-          }`}
-          style={{
-            color: selectedChild === child ? `${selectedColor}` : "#99a1af",
-          }}
-          onClick={() => setSelectedChild(child)}
-        >
-          {child}
-        </button>
-      ))}
+      {child.length > 0 &&
+        child.map((_child) => (
+          <button
+            key={_child.userId}
+            className={`flex-1 py-1 rounded-xl text-sm font-semibold transition ${
+              selectedChildId === _child.userId ? "bg-white shadow " : ""
+            }`}
+            style={{
+              color: selectedChildId === _child.userId ? `${selectedColor}` : "#99a1af",
+            }}
+            onClick={() => setSelectedChildId(_child.userId)}
+          >
+            {_child.name}
+          </button>
+        ))}
     </div>
   );
 };

@@ -10,30 +10,38 @@ import ChatOutModal from "../../../features/invest/ChatOutModal";
 import ChatTurnSideModal from "../../../features/invest/ChatTurnSideModal";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ArrowUp from "../../../components/icons/ArrowUp";
+import apiClient from "../../../api/api";
+import { connectChatBot } from "../../../api/invest/connect-chat-bot";
+import { editScenario } from "../../../api/invest/edit-scenario";
 
-const themes = {
+interface Theme {
+  id: string;
+  name: string;
+  color: string;
+}
+
+const themes: Record<string, Theme> = {
   "아기돼지 삼형제": {
-    id: 1,
+    id: "1",
     name: "아기돼지 삼형제",
     color: "#1DB3FB",
   },
   "푸드 트럭 왕국": {
-    id: 2,
+    id: "2",
     name: "푸드 트럭 왕국",
     color: "#78D335",
   },
   "마법 왕국": {
-    id: 3,
+    id: "3",
     name: "마법 왕국",
     color: "#C57CF0",
   },
   "달빛 도둑": {
-    id: 4,
+    id: "4",
     name: "달빛 도둑",
     color: "#FE4A4E",
   },
-} as const;
-
+};
 // const scenarioNames = {
 //   "아기돼지 삼형제": ["아기돼지1", "아기돼지2", "아기돼지3"],
 //   "푸드 트럭 왕국": ["푸드트럭1", "푸드트럭2", "푸드트럭3"],
@@ -66,14 +74,38 @@ interface ChatMessage {
 export const InvestChatBotPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const scenarioType = searchParams.get("scenarioType");
+  const scenarioType = searchParams.get("scenarioType") || "";
   const scenarioName = searchParams.get("scenarioName");
-  console.log(scenarioType, scenarioName);
+  const scenarioId = searchParams.get("scenarioId");
+  console.log(scenarioType, scenarioName, scenarioId);
 
-  const [selectedTheme, setSelectedTheme] = useState<keyof typeof themes>(scenarioType as keyof typeof themes);
-  console.log(setSelectedTheme);
+  useEffect(() => {
+    let eventSource: EventSource | null | undefined = null;
 
-  const [selectedChild, setSelectedChild] = useState("자녀 1");
+    const initializeChatBot = async () => {
+      try {
+        // API 호출
+        if (scenarioId) {
+          const result = editScenario(scenarioId);
+          console.log(result);
+        }
+
+        // SSE 연결
+        eventSource = connectChatBot();
+      } catch (error) {
+        console.error("챗봇 초기화 중 에러 발생:", error);
+      }
+    };
+
+    initializeChatBot();
+
+    // cleanup 함수
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, []);
 
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
@@ -98,15 +130,13 @@ export const InvestChatBotPage: React.FC = () => {
     });
 
     // 포포 교수님 응답 (실제로는 API 호출 등으로 대체)
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          message: "네, 좋은 질문이에요! 그 부분에 대해 자세히 설명해드릴게요.",
-          isTeacher: true,
-        },
-      ]);
-    }, 1000);
+    setMessages((prev) => [
+      ...prev,
+      {
+        message: "네, 좋은 질문이에요! 그 부분에 대해 자세히 설명해드릴게요.",
+        isTeacher: true,
+      },
+    ]);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -131,8 +161,8 @@ export const InvestChatBotPage: React.FC = () => {
       <SideModal isOpen={senarioModalOpen} onClose={() => setSenarioModalOpen(false)}>
         <ChatTurnSideModal
           turns={turns}
-          scenarioColor={themes[selectedTheme].color}
-          selectedTheme={selectedTheme}
+          scenarioColor={themes[scenarioType].color}
+          selectedTheme={scenarioType}
           scenarioName={scenarioName || ""}
           setSenarioModalOpen={setSenarioModalOpen}
           quitButtonOnClick={() => {
@@ -155,7 +185,7 @@ export const InvestChatBotPage: React.FC = () => {
         <div className="absolute top-18 right-7 text-[0.625rem] px-1 py-0.5 bg-white rounded-xl shadow-custom-2 border border-gray-100">
           턴
         </div>
-        <ChildNavBar selectedColor={"#000000"} selectedChild={selectedChild} setSelectedChild={setSelectedChild} />
+        <ChildNavBar selectedColor={"#000000"} />
       </>
       {/* 채팅 리스트 */}
       <div className="flex flex-col gap-y-3 overflow-y-auto h-[calc(100vh-20.5rem)]" ref={chatContainerRef}>
@@ -164,7 +194,7 @@ export const InvestChatBotPage: React.FC = () => {
             key={index}
             message={msg.message}
             isTeacher={msg.isTeacher}
-            parentChatColor={themes[selectedTheme].color}
+            parentChatColor={themes[scenarioType].color}
           />
         ))}
       </div>

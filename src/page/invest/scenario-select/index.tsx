@@ -8,7 +8,8 @@ import { TurnSideModal } from "../../../features/invest/TurnSideModal";
 import { ScenarioCard } from "../../../features/invest/ScenarioCard";
 import Pagination from "../../../features/invest/Pagination";
 import ThemeSelector from "../../../features/invest/ThemeSelector";
-import { getScenarioList, type PaginatedResponse, type ScenarioItem } from "../../../api/invest/scenario-list";
+import { getScenarioList, type ScenarioItem } from "../../../api/invest/scenario-list";
+import { useAuthStore } from "../../../zustand/auth";
 
 // const colors = ["#1DB3FB", "#78D335", "#C57CF0", "#FE4A4E", "#FFBE00", "#FEE0DF"];
 
@@ -40,39 +41,29 @@ const themes: Record<string, Theme> = {
   },
 };
 
-const scenarioNames = {
-  "아기돼지 삼형제": ["아기돼지1", "아기돼지2", "아기돼지3", "아기돼지4", "아기돼지5"],
-  "푸드 트럭 왕국": ["푸드트럭1", "푸드트럭2", "푸드트럭3"],
-  "마법 왕국": ["마법왕국1", "마법왕국2", "마법왕국3"],
-  "달빛 도둑": ["달빛도둑1", "달빛도둑2", "달빛도둑3"],
-};
+const DEFAULT_SCENARIO_ID = "a2be0f02-14c4-4a10-9c49-cbbac74bee08";
 
 export const InvestScenarioSelectPage: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedTheme, setSelectedTheme] = useState<keyof typeof scenarioNames>(
-    themes["아기돼지 삼형제"].name as keyof typeof scenarioNames
-  );
+  const { selectedChildId } = useAuthStore();
+  const [selectedTheme, setSelectedTheme] = useState(themes["아기돼지 삼형제"].name);
 
   // 드롭다운 메뉴 상태 관리
   const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>({});
   // 컴포넌트 내부
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10;
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const [scenarioList, setScenarioList] = useState<PaginatedResponse<ScenarioItem>>({
-    content: [],
-    totalElements: 0,
-    totalPages: 0,
-    size: 0,
-    number: 0,
-  });
+  const [scenarioList, setScenarioList] = useState<ScenarioItem[]>([]);
 
   useEffect(() => {
-    getScenarioList(currentPage, 5).then((data) => {
-      console.log("data", data);
-      setScenarioList(data);
-    });
-  }, [currentPage]);
+    if (selectedChildId) {
+      getScenarioList(currentPage, 1, selectedChildId).then((data) => {
+        setScenarioList(data.scenarioList);
+        setTotalPages(Number(data.totalPageSize));
+      });
+    }
+  }, [currentPage, selectedChildId]);
 
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
@@ -88,40 +79,44 @@ export const InvestScenarioSelectPage: React.FC = () => {
     "9턴": false,
     "10턴": false,
   });
-
-  const handleDropdownToggle = (scenarioName: string) => {
+  // api를 한번더 호출하라는거야
+  // 아니면 시나리오 조회
+  //
+  const handleDropdownToggle = (scenarioId: string) => {
     setOpenDropdowns((prev) => ({
       ...prev,
-      [scenarioName]: !prev[scenarioName],
+      [scenarioId]: !prev[scenarioId],
     }));
   };
 
-  const handleEdit = (scenarioName: string) => {
-    // TODO: 수정 로직 구현
-    navigate(`/invest/chat-bot?scenarioType=${selectedTheme}&scenarioName=${scenarioName}`);
-  };
-
-  const handleDelete = (scenarioName: string) => {
-    // TODO: 삭제 로직 구현
-    console.log("Delete scenario:", scenarioName);
-  };
-
-  const handleView = (scenarioName: string) => {
+  const handleView = (scenarioId: string) => {
     // TODO: 조회 로직 구현
-    console.log(scenarioName);
     setSenarioModalOpen(true);
   };
 
-  const handleThemeSelect = (themeName: string, firstScenario: string) => {
-    console.log(themeName, firstScenario);
-    setSelectedTheme(themeName as keyof typeof scenarioNames);
+  const handleEdit = (scenarioId: string) => {
+    // TODO: 수정 로직 구현
+    navigate(`/invest/chat-bot?scenarioType=${selectedTheme}&scenarioName=${scenarioId}`);
+  };
+
+  const handleDelete = (scenarioId: string) => {
+    // TODO: 삭제 로직 구현
+    console.log("Delete scenario:", scenarioId);
+  };
+
+  const handleThemeSelect = (themeName: string) => {
+    setSelectedTheme(themeName);
   };
 
   return (
     <>
       {/* 시나리오 종류 */}
       <Modal isOpen={senarioCreateModalOpen} onClose={() => setSenarioCreateModalOpen(false)}>
-        <ScenarioCreateModal selectedTheme={selectedTheme} setSenarioCreateModalOpen={setSenarioCreateModalOpen} />
+        <ScenarioCreateModal
+          scenarioId={DEFAULT_SCENARIO_ID}
+          selectedTheme={selectedTheme}
+          setSenarioCreateModalOpen={setSenarioCreateModalOpen}
+        />
       </Modal>
       <SideModal isOpen={senarioModalOpen} onClose={() => setSenarioModalOpen(false)}>
         <TurnSideModal
@@ -139,11 +134,11 @@ export const InvestScenarioSelectPage: React.FC = () => {
             key={theme.id}
             bgColor={theme.color}
             name={theme.name}
-            onClick={() => handleThemeSelect(theme.name, scenarioNames[theme.name as keyof typeof scenarioNames][0])}
+            onClick={() => handleThemeSelect(theme.name)}
           />
         ))}
       </div>
-
+      {/* 47006e57 */}
       {/* 시나리오, 시나리오 생성 */}
       <div className="flex justify-between mb-8">
         <div className="text-sm">시나리오</div>
@@ -157,17 +152,24 @@ export const InvestScenarioSelectPage: React.FC = () => {
 
       {/* 시나리오 리스트 */}
       <div className="flex flex-col gap-y-6 mb-6">
-        {scenarioNames[selectedTheme as keyof typeof scenarioNames].map((name) => (
-          <ScenarioCard
-            name={name}
-            buttonColor={themes[selectedTheme as keyof typeof scenarioNames].color}
-            handleDropdownToggle={handleDropdownToggle}
-            handleEdit={handleEdit}
-            handleView={handleView}
-            handleDelete={handleDelete}
-            openDropdowns={openDropdowns}
-          />
-        ))}
+        {scenarioList.length > 0 &&
+          scenarioList.map((scenario) => {
+            const storyData = JSON.parse(scenario.story);
+            return (
+              <ScenarioCard
+                key={scenario.scenarioId}
+                name={storyData[0].stocks[0].name}
+                id={scenario.scenarioId}
+                buttonColor={themes[selectedTheme].color}
+                updatedAt={scenario.updatedAt || ""}
+                handleDropdownToggle={handleDropdownToggle}
+                handleEdit={handleEdit}
+                handleView={handleView}
+                handleDelete={handleDelete}
+                openDropdowns={openDropdowns}
+              />
+            );
+          })}
       </div>
       {/* 페이지네이션 */}
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

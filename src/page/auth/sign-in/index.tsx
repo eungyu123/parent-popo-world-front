@@ -33,7 +33,7 @@ export function SignInPage() {
     e.preventDefault();
     try {
       const response = await apiClient.post("/auth/login", formData);
-      console.log("응답 헤더:", response.headers);
+      console.log("응답 헤더:", response.data);
 
       // 액세스 토큰 저장
       const accessToken = response.headers["authorization"]?.replace("Bearer ", "");
