@@ -1,45 +1,29 @@
-// const Access_key = sessionStorage.getItem("Access_key");
-// const Refresh_key = sessionStorage.getItem("Refresh_key");
+import { useAuthStore } from "../../zustand/auth";
+import Cookies from "js-cookie";
+import { EventSourcePolyfill } from "event-source-polyfill";
 
-// const EventSource = EventSourcePolyfill;
-// useEffect(() => {
-//   if (isLoggedIn) {
-//     try {
-//       const fetchSse = async () => {
-//         const eventSource = new EventSource(
-//           `https://moment-backend.shop/sse/chat/alarm/${userId}`,
-//           {
-//             headers: {
-//               "Content-Type": "text/event-stream",
-//               ACCESS_KEY: `${Access_key}`,
-//               REFRESH_KEY: `${Refresh_key}`,
-//             },
-//             withCredentials: true,
-//           }
-//         );
-//         eventSource.addEventListener("chatAlarm-event", (event) => {
-//           const eventData = JSON.parse(event.data);
-//           console.log("Received event:", eventData);
-//           setAlarmList((prevList) => [...prevList, eventData]);
-//         });
-//       };
-//       fetchSse();
-//     } catch (error) {
-//       throw error;
-//     }
-//   }
-// }, [isLoggedIn]);
+type MessageHandler = (data: any) => void;
 
-export const connectChatBot = () => {
+export const connectChatBot = (onMessage: MessageHandler) => {
+  const token = useAuthStore.getState().accessToken;
+  const Refresh_key = Cookies.get("refreshToken");
+
   try {
-    const eventSource = new EventSource(`http://52.78.53.247:8080/api/chatbot/sse`);
+    const eventSource = new EventSourcePolyfill(`http://52.78.53.247:8080/api/chatbot/sse`, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        Authorization: `Bearer ${token}`,
+        Refresh_key: `Bearer ${Refresh_key}`,
+      },
+      withCredentials: true,
+    });
 
     // 메시지 이벤트 리스너
     eventSource.addEventListener("message", (event) => {
       try {
         const data = JSON.parse(event.data);
         console.log("Received message:", data);
-        // 여기에 메시지 처리 로직 추가
+        onMessage(data); // 메시지 핸들러 호출
       } catch (error) {
         console.error("메시지 파싱 에러:", error);
       }

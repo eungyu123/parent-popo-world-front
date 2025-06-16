@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
+    "@types/event-source-polyfill": "^1.0.5",
     "@types/js-cookie": "^3.0.6",
     "@types/react-router-dom": "^5.3.3",
     "@types/recharts": "^1.8.29",
     "axios": "^1.9.0",
+    "event-source-polyfill": "^1.0.31",
     "js-cookie": "^3.0.5",
     "path": "^0.12.7",
     "react": "^19.1.0",

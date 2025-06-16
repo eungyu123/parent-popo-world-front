@@ -23,12 +23,18 @@ interface ScenarioList {
  * @returns 페이지네이션된 시나리오 목록
  * @throws ApiError 네트워크 에러, 인증 에러, 서버 에러 등
  */
-export const getScenarioList = async (page: number, size: number, childId: string): Promise<ScenarioList> => {
+export const getScenarioList = async (
+  page: number,
+  size: number,
+  childId: string,
+  chatbotId: string
+): Promise<ScenarioList> => {
   try {
     const response = await apiClient.post<ScenarioList>("/api/chatbot/items", {
       page,
       size,
       childId,
+      chatbotId,
     });
     return response.data;
   } catch (error) {

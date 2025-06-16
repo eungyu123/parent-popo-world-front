@@ -11,33 +11,36 @@ import ThemeSelector from "../../../features/invest/ThemeSelector";
 import { getScenarioList, type ScenarioItem } from "../../../api/invest/scenario-list";
 import { useAuthStore } from "../../../zustand/auth";
 
-// const colors = ["#1DB3FB", "#78D335", "#C57CF0", "#FE4A4E", "#FFBE00", "#FEE0DF"];
-
 interface Theme {
   id: string;
   name: string;
   color: string;
+  chatbotId: string;
 }
 const themes: Record<string, Theme> = {
   "아기돼지 삼형제": {
     id: "1",
     name: "아기돼지 삼형제",
     color: "#1DB3FB",
+    chatbotId: "1111",
   },
   "푸드 트럭 왕국": {
     id: "2",
     name: "푸드 트럭 왕국",
     color: "#78D335",
+    chatbotId: "2222",
   },
   "마법 왕국": {
     id: "3",
     name: "마법 왕국",
     color: "#C57CF0",
+    chatbotId: "3333",
   },
   "달빛 도둑": {
     id: "4",
     name: "달빛 도둑",
     color: "#FE4A4E",
+    chatbotId: "4444",
   },
 };
 
@@ -58,12 +61,12 @@ export const InvestScenarioSelectPage: React.FC = () => {
 
   useEffect(() => {
     if (selectedChildId) {
-      getScenarioList(currentPage, 1, selectedChildId).then((data) => {
+      getScenarioList(currentPage, 1, selectedChildId, themes[selectedTheme].chatbotId).then((data) => {
         setScenarioList(data.scenarioList);
         setTotalPages(Number(data.totalPageSize));
       });
     }
-  }, [currentPage, selectedChildId]);
+  }, [currentPage, selectedChildId, selectedTheme]);
 
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
@@ -81,7 +84,7 @@ export const InvestScenarioSelectPage: React.FC = () => {
   });
   // api를 한번더 호출하라는거야
   // 아니면 시나리오 조회
-  //
+
   const handleDropdownToggle = (scenarioId: string) => {
     setOpenDropdowns((prev) => ({
       ...prev,

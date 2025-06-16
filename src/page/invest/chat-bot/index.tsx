@@ -10,7 +10,6 @@ import ChatOutModal from "../../../features/invest/ChatOutModal";
 import ChatTurnSideModal from "../../../features/invest/ChatTurnSideModal";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ArrowUp from "../../../components/icons/ArrowUp";
-import apiClient from "../../../api/api";
 import { connectChatBot } from "../../../api/invest/connect-chat-bot";
 import { editScenario } from "../../../api/invest/edit-scenario";
 
@@ -42,6 +41,7 @@ const themes: Record<string, Theme> = {
     color: "#FE4A4E",
   },
 };
+
 // const scenarioNames = {
 //   "아기돼지 삼형제": ["아기돼지1", "아기돼지2", "아기돼지3"],
 //   "푸드 트럭 왕국": ["푸드트럭1", "푸드트럭2", "푸드트럭3"],
@@ -77,7 +77,10 @@ export const InvestChatBotPage: React.FC = () => {
   const scenarioType = searchParams.get("scenarioType") || "";
   const scenarioName = searchParams.get("scenarioName");
   const scenarioId = searchParams.get("scenarioId");
-  console.log(scenarioType, scenarioName, scenarioId);
+
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let eventSource: EventSource | null | undefined = null;
@@ -86,12 +89,14 @@ export const InvestChatBotPage: React.FC = () => {
       try {
         // API 호출
         if (scenarioId) {
-          const result = editScenario(scenarioId);
-          console.log(result);
+          await editScenario(scenarioId);
         }
 
         // SSE 연결
-        eventSource = connectChatBot();
+        eventSource = connectChatBot((data) => {
+          // 선생님 메시지
+          setMessages([{ message: data, isTeacher: true }]);
+        });
       } catch (error) {
         console.error("챗봇 초기화 중 에러 발생:", error);
       }
@@ -110,15 +115,6 @@ export const InvestChatBotPage: React.FC = () => {
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
 
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      message: "안녕하세요! 포포 교수님입니다. 오늘도 즐거운 금융 교육을 시작해볼까요?",
-      isTeacher: true,
-    },
-  ]);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLDivElement>(null);
-
   const handleSendMessage = () => {
     if (!inputRef.current?.textContent?.trim()) return;
 
@@ -128,15 +124,6 @@ export const InvestChatBotPage: React.FC = () => {
     ).then(() => {
       inputRef.current!.textContent = "";
     });
-
-    // 포포 교수님 응답 (실제로는 API 호출 등으로 대체)
-    setMessages((prev) => [
-      ...prev,
-      {
-        message: "네, 좋은 질문이에요! 그 부분에 대해 자세히 설명해드릴게요.",
-        isTeacher: true,
-      },
-    ]);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -189,14 +176,23 @@ export const InvestChatBotPage: React.FC = () => {
       </>
       {/* 채팅 리스트 */}
       <div className="flex flex-col gap-y-3 overflow-y-auto h-[calc(100vh-20.5rem)]" ref={chatContainerRef}>
-        {messages.map((msg, index) => (
+        {messages.length > 0 ? (
+          messages.map((msg, index) => (
+            <ChatMessage
+              key={index}
+              message={msg.message}
+              isTeacher={msg.isTeacher}
+              parentChatColor={themes[scenarioType].color}
+            />
+          ))
+        ) : (
           <ChatMessage
-            key={index}
-            message={msg.message}
-            isTeacher={msg.isTeacher}
+            key={"첫 메세지"}
+            message={"안녕하세요  포포 교수님입니다. 첫 메시지와 함께 수정된 오른쪽 위 턴 정보를 확인하세요!"}
+            isTeacher={true}
             parentChatColor={themes[scenarioType].color}
           />
-        ))}
+        )}
       </div>
       {/* 채팅 입력 */}
       <div className="absolute flex flex-col-reverse bottom-6 left-8 w-[calc(100%-4rem)] px-4 pt-4 pb-11 bg-main-white-500 rounded-xl shadow-custom-2 border border-gray-100">
@@ -209,9 +205,6 @@ export const InvestChatBotPage: React.FC = () => {
         <button
           onClick={handleSendMessage}
           className="bg-black absolute flex justify-center items-center bottom-2 right-2 w-6 h-6 object-contain rounded-full"
-          // style={{
-          //   backgroundColor: themes[selectedTheme].color,
-          // }}
         >
           <ArrowUp width={16} height={16} fill="white" />
         </button>
