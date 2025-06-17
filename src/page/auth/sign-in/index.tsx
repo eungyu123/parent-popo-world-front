@@ -20,6 +20,7 @@ export function SignInPage() {
     email: "",
     password: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,7 +32,11 @@ export function SignInPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
+
     try {
+      setIsSubmitting(true);
       const response = await apiClient.post("/auth/login", formData);
       console.log("응답 헤더:", response.data);
 
@@ -64,6 +69,8 @@ export function SignInPage() {
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

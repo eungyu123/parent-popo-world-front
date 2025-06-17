@@ -11,13 +11,13 @@ export const StoreCard: React.FC = () => {
     >
       <div className="flex justify-between items-center text-lg text-white font-medium px-5 py-3 w-full bg-main-blue-300 rounded-t-xl">
         <span className="">상점</span>
-        <Link to="/store/product-management">
-          <img
-            src={whiteRightArrow}
-            alt=""
-            className="w-5 h-5 p-1 object-contain active:scale-90 transition-all duration-100"
-          />
-        </Link>
+        {/* <Link to="/store/product-management"> */}
+        <img
+          src={whiteRightArrow}
+          alt=""
+          className="w-5 h-5 p-1 object-contain active:scale-90 transition-all duration-100"
+        />
+        {/* </Link> */}
       </div>
       <div className="flex flex-col px-4 py-3.5 text-sm justify-between gap-y-2">
         <h4 className="">구매 요청</h4>

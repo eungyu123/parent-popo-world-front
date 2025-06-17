@@ -36,6 +36,9 @@ export const getScenarioList = async (
       childId,
       chatbotId,
     });
+
+    console.log("시나리오 목록", response.data);
+
     return response.data;
   } catch (error) {
     if (error instanceof ApiError) {

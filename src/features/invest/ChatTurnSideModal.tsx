@@ -1,6 +1,7 @@
 import { useState } from "react";
 import arrow_down from "../../assets/image/common/arrow-down.png";
 import arrow_right from "../../assets/image/common/arrow-right.png";
+import type { TurnState } from "../../page/invest/chat-bot";
 
 export default function ChatTurnSideModal({
   turns,
@@ -10,7 +11,7 @@ export default function ChatTurnSideModal({
   setSenarioModalOpen,
   quitButtonOnClick,
 }: {
-  turns: { title: string; content: string }[];
+  turns: TurnState[];
   scenarioColor: string;
   selectedTheme: string;
   scenarioName: string;
@@ -62,7 +63,7 @@ export default function ChatTurnSideModal({
               className="w-full flex justify-between items-center px-3 py-2 bg-gray-100 rounded hover:bg-gray-200 text-sm font-medium"
               onClick={() => setOpenTurn({ ...openTurn, [turn.title]: !openTurn[turn.title] })}
             >
-              <span>{turn.title}</span>
+              <span>{turn.title}턴 </span>
               <span className="text-lg">
                 {openTurn[turn.title] ? (
                   <img src={arrow_down} alt="arrow_down" className="w-4 h-4 object-contain" />
@@ -72,8 +73,16 @@ export default function ChatTurnSideModal({
               </span>
             </button>
             {openTurn[turn.title] && (
-              <div className="bg-gray-50 border border-gray-200 rounded-b px-3 py-2 text-xs text-gray-700">
-                {turn.content}
+              <div className="bg-gray-50 border border-t-0 border-gray-200 rounded-b-lg px-4 py-3 mt-[-1px] text-sm text-gray-700">
+                <div className="mb-2">
+                  <span className="font-medium text-gray-600">{turn.title === "1" ? "🚀 시작: " : "📌 결과:"}</span>{" "}
+                  {turn.result}
+                </div>
+                {turn.news && (
+                  <div>
+                    <span className="font-medium text-gray-600">📰 뉴스:</span> {turn.news}
+                  </div>
+                )}
               </div>
             )}
           </div>

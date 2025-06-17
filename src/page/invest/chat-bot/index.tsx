@@ -10,8 +10,13 @@ import ChatOutModal from "../../../features/invest/ChatOutModal";
 import ChatTurnSideModal from "../../../features/invest/ChatTurnSideModal";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ArrowUp from "../../../components/icons/ArrowUp";
-import { connectChatBot } from "../../../api/invest/connect-chat-bot";
 import { editScenario } from "../../../api/invest/edit-scenario";
+import { EventSourcePolyfill } from "event-source-polyfill";
+import { sendChatbotMessage } from "../../../api/invest/chatbot-message";
+import { useAuthStore } from "../../../zustand/auth";
+import Cookies from "js-cookie";
+import theacher_popo from "../../../assets/image/common/teacher_popo.png";
+import { saveScenario } from "../../../api/invest/save-scenario";
 
 interface Theme {
   id: string;
@@ -49,21 +54,39 @@ const themes: Record<string, Theme> = {
 //   "달빛 도둑": ["달빛도둑1", "달빛도둑2", "달빛도둑3"],
 // };
 
-const turns = [
-  {
-    title: "1턴",
-    content:
-      "1턴의 상세 내용입니다. 1턴의 상세 내용입니다.1턴의 상세 내용입니다.1턴의 상세 내용입니다.1턴의 상세 내용입니다.1턴의 상세 내용입니다.1턴의 상세 내용입니다.",
-  },
-  { title: "2턴", content: "2턴의 상세 내용입니다." },
-  { title: "3턴", content: "3턴의 상세 내용입니다." },
-  { title: "4턴", content: "4턴의 상세 내용입니다." },
-  { title: "5턴", content: "5턴의 상세 내용입니다." },
-  { title: "6턴", content: "6턴의 상세 내용입니다." },
-  { title: "7턴", content: "7턴의 상세 내용입니다." },
-  { title: "8턴", content: "8턴의 상세 내용입니다." },
-  { title: "9턴", content: "9턴의 상세 내용입니다." },
-  { title: "10턴", content: "10턴의 상세 내용입니다." },
+// 각 주식(돼지)의 상태를 나타내는 타입
+export interface Stock {
+  name: string; // 돼지 이름 (예: '첫째 돼지')
+  risk_level: string; // 리스크 수준 (예: '고위험 고수익')
+  description: string; // 설명 (예: "지푸라기로 가장 빠르게 집을 짓습니다.")
+  before_value: number; // 이전 턴의 가치
+  current_value: number; // 현재 턴의 가치
+  expectation: string; // 다음 턴에 대한 기대치
+}
+
+// 각 턴의 전체 상태를 나타내는 타입
+export interface StroyState {
+  turn_number: number; // 턴 번호
+  result: string; // 이 턴의 결과 요약
+  news: string; // 뉴스 내용
+  news_tag: "high" | "mid" | "low" | "all" | ""; // 뉴스 영향 범위
+  stocks: Stock[]; // 주식(돼지) 목록
+}
+
+export interface TurnState {
+  title: string;
+  result: string;
+  news: string;
+}
+
+const initialTurns = [
+  { title: "1", result: "", news: "" },
+  { title: "2", result: "", news: "" },
+  { title: "3", result: "", news: "" },
+  { title: "4", result: "", news: "" },
+  { title: "5", result: "", news: "" },
+  { title: "6", result: "", news: "" },
+  { title: "7", result: "", news: "" },
 ];
 
 interface ChatMessage {
@@ -75,56 +98,104 @@ export const InvestChatBotPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const scenarioType = searchParams.get("scenarioType") || "";
-  const scenarioName = searchParams.get("scenarioName");
-  const scenarioId = searchParams.get("scenarioId");
+  const scenarioName = searchParams.get("scenarioName") || "";
+  const scenarioId = searchParams.get("scenarioId") || "";
+  const { selectedChildId } = useAuthStore();
 
+  const [turnData, setTurnData] = useState<TurnState[]>(initialTurns);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isSend, setIsSend] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let eventSource: EventSource | null | undefined = null;
-
-    const initializeChatBot = async () => {
-      try {
-        // API 호출
-        if (scenarioId) {
-          await editScenario(scenarioId);
-        }
-
-        // SSE 연결
-        eventSource = connectChatBot((data) => {
-          // 선생님 메시지
-          setMessages([{ message: data, isTeacher: true }]);
-        });
-      } catch (error) {
-        console.error("챗봇 초기화 중 에러 발생:", error);
-      }
-    };
-
-    initializeChatBot();
-
-    // cleanup 함수
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-      }
-    };
-  }, []);
 
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  let eventSource: EventSourcePolyfill | null = null;
+  useEffect(() => {
+    if (scenarioId) {
+      editScenario(scenarioId);
+    }
+
+    // SSE 연결
+    const token = useAuthStore.getState().accessToken;
+    const Refresh_key = Cookies.get("refreshToken");
+
+    try {
+      eventSource = new EventSourcePolyfill(`http://52.78.53.247:8080/api/chatbot/sse`, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          Authorization: `Bearer ${token}`,
+          Refresh_key: `Bearer ${Refresh_key}`,
+        },
+        withCredentials: true,
+      });
+
+      // 메시지 이벤트 리스너
+      eventSource.addEventListener("chatbot", (event: any) => {
+        try {
+          console.log(event, event.data);
+          const data = JSON.parse(event.data);
+          console.log("Received chatbot:", data);
+          const chapterId = data.chapterId;
+          const isCustom = data.isCustom;
+          const story: StroyState[] = JSON.parse(data.story);
+          const turns: TurnState[] = story.map((turn) => ({
+            title: turn.turn_number.toString(),
+            result: turn.result,
+            news: turn.news,
+          }));
+          setTurnData(turns);
+          setMessages((prev) => [...prev, { message: "응답이 왔습니다. 턴 데이터를 확인하세요", isTeacher: true }]);
+          setIsLoading(false);
+        } catch (error) {
+          console.error("메시지 파싱 에러:", error);
+        }
+      });
+
+      // 에러 이벤트 리스너
+      eventSource.addEventListener("error", (event) => {
+        console.error("SSE 연결 에러 - 상태:", eventSource?.readyState);
+        console.error("SSE 연결 에러 - URL:", eventSource?.url);
+        console.error("SSE 연결 에러 - 전체 에러:", event);
+        eventSource?.close();
+      });
+
+      eventSource.addEventListener("connect", (event: any) => {
+        console.log("초기 연결 수신:", event.data); // "connected"
+      });
+
+      // 연결 성공 이벤트 리스너
+      eventSource.addEventListener("open", () => {
+        console.log("SSE 연결 성공 - URL:", eventSource?.url);
+      });
+    } catch (error) {
+      console.error("챗봇 초기화 중 에러 발생:", error);
+    }
+    // cleanup 함수
+    return () => {
+      if (eventSource) {
+        console.log("Cleaning up SSE connection");
+        eventSource.close();
+      }
+    };
+  }, [eventSource]);
 
   const handleSendMessage = () => {
-    if (!inputRef.current?.textContent?.trim()) return;
+    if (!inputRef.current?.textContent?.trim() || isLoading) return;
 
-    // 사용자 메시지 추가
-    Promise.resolve(
-      setMessages((prev) => [...prev, { message: inputRef.current?.textContent || "", isTeacher: false }])
-    ).then(() => {
-      inputRef.current!.textContent = "";
-    });
+    setMessages((prev) => [...prev, { message: inputRef.current?.textContent || "", isTeacher: false }]);
+    sendChatbotMessage({ message: inputRef.current?.textContent || "" });
+    setIsSend(true);
+    setIsLoading(true);
   };
+
+  useEffect(() => {
+    if (isSend) {
+      inputRef.current!.textContent = "";
+      setIsSend(false);
+    }
+  }, [messages]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -132,12 +203,6 @@ export const InvestChatBotPage: React.FC = () => {
       handleSendMessage();
     }
   };
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
 
   return (
     <>
@@ -147,12 +212,15 @@ export const InvestChatBotPage: React.FC = () => {
       </Modal>
       <SideModal isOpen={senarioModalOpen} onClose={() => setSenarioModalOpen(false)}>
         <ChatTurnSideModal
-          turns={turns}
+          turns={turnData}
           scenarioColor={themes[scenarioType].color}
           selectedTheme={scenarioType}
           scenarioName={scenarioName || ""}
           setSenarioModalOpen={setSenarioModalOpen}
           quitButtonOnClick={() => {
+            if (selectedChildId) {
+              saveScenario(selectedChildId);
+            }
             navigate("/invest/scenario-select");
           }}
         />
@@ -175,7 +243,7 @@ export const InvestChatBotPage: React.FC = () => {
         <ChildNavBar selectedColor={"#000000"} />
       </>
       {/* 채팅 리스트 */}
-      <div className="flex flex-col gap-y-3 overflow-y-auto h-[calc(100vh-20.5rem)]" ref={chatContainerRef}>
+      <div className="flex flex-col gap-y-3 overflow-y-auto h-[calc(100vh-20.5rem)]">
         {messages.length > 0 ? (
           messages.map((msg, index) => (
             <ChatMessage
@@ -192,6 +260,21 @@ export const InvestChatBotPage: React.FC = () => {
             isTeacher={true}
             parentChatColor={themes[scenarioType].color}
           />
+        )}
+        {isLoading && (
+          <div className="flex flex-col gap-y-1">
+            <div className="flex">
+              <div className="flex justify-center items-center w-8 h-8 rounded-full bg-main-white-500 border border-gray-100 shadow-custom-2">
+                <img src={theacher_popo} alt={"포포 교수님"} className="w-4/5 h-4/5 object-contain" />
+              </div>
+              <div className="text-xs py-2.5 px-2">포포 교수님</div>
+            </div>
+            <div className="flex space-x-1 ml-10 mt-2">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-[bounce_1s_infinite_0ms]"></div>
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-[bounce_1s_infinite_200ms]"></div>
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-[bounce_1s_infinite_400ms]"></div>
+            </div>
+          </div>
         )}
       </div>
       {/* 채팅 입력 */}

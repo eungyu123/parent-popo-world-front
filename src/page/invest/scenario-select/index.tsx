@@ -82,8 +82,6 @@ export const InvestScenarioSelectPage: React.FC = () => {
     "9턴": false,
     "10턴": false,
   });
-  // api를 한번더 호출하라는거야
-  // 아니면 시나리오 조회
 
   const handleDropdownToggle = (scenarioId: string) => {
     setOpenDropdowns((prev) => ({
