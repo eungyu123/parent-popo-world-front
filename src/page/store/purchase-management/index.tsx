@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IMAGE_URLS } from "../../../constants/constants";
 import coinIcon from "@/assets/image/common/common_coin.webp";
 import { ProductChart } from "../../../features/store/ProductChart";
+import { useAuthStore } from "../../../zustand/auth";
+import { getUsageHistory, type UsageHistory } from "../../../api/market/usage-history";
 
 // 무한 스크롤 구현
 
 export const PurchaseManagementPage: React.FC = () => {
+  const { selectedChildId } = useAuthStore();
+  const [usageHistory, setUsageHistory] = useState<UsageHistory[]>([]);
+  useEffect(() => {
+    if (!selectedChildId) return;
+    getUsageHistory(selectedChildId).then((res) => {
+      setUsageHistory(res);
+    });
+  }, [selectedChildId]);
+  console.log("usageHistory", usageHistory);
+
   return (
     <>
       {/* 구매 그래프 제목  */}

@@ -93,7 +93,7 @@ apiClient.interceptors.response.use(
           // 리프레시 토큰으로 새로운 액세스 토큰 요청
           console.log("refreshToken", refreshToken);
           return apiClient
-            .post("/auth/token/refresh", { refreshToken })
+            .post("/auth/token/refresh", {}, { headers: { "Refresh-Token": refreshToken } })
             .then((response) => {
               const newAccessToken = response.headers["authorization"];
               if (newAccessToken) {
