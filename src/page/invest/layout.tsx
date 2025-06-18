@@ -18,7 +18,6 @@ export const InvestLayout: React.FC = () => {
   const pathname = url.pathname.split("/")[2];
   const [isTabOpen, setIsTabOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(urls[pathname as keyof typeof urls]);
-  const [selectedChild, setSelectedChild] = useState("자녀 1");
   const navigate = useNavigate();
 
   return (
@@ -51,7 +50,7 @@ export const InvestLayout: React.FC = () => {
           </ul>
         )}
       </Header>
-      <ChildNavBar selectedColor={"#000000"} selectedChild={selectedChild} setSelectedChild={setSelectedChild} />
+      <ChildNavBar selectedColor={"#000000"} />
       <Outlet />
     </>
   );

@@ -3,7 +3,7 @@ import { DropdownMenu } from "./DropdownMenu";
 
 export const ScenarioCard = ({
   name,
-  id,
+  scenarioId,
   updatedAt,
   buttonColor,
   handleDropdownToggle,
@@ -13,13 +13,13 @@ export const ScenarioCard = ({
   openDropdowns,
 }: {
   name: string;
-  id: string;
+  scenarioId: string;
   buttonColor: string;
   updatedAt: string;
-  handleDropdownToggle: (id: string) => void;
-  handleEdit: (id: string) => void;
-  handleView: (id: string) => void;
-  handleDelete: (id: string) => void;
+  handleDropdownToggle: (scenarioId: string) => void;
+  handleEdit: (scenarioName: string, scenarioId: string) => void;
+  handleView: (scenarioId: string) => void;
+  handleDelete: (scenarioId: string) => void;
   openDropdowns: Record<string, boolean>;
 }) => {
   return (
@@ -31,16 +31,16 @@ export const ScenarioCard = ({
           <button
             className="text-xs text-white p-1 rounded-sm flex items-center gap-x-1"
             style={{ backgroundColor: buttonColor }}
-            onClick={() => handleDropdownToggle(name)}
+            onClick={() => handleDropdownToggle(scenarioId)}
           >
             <EditIcon />
           </button>
           <DropdownMenu
-            isOpen={openDropdowns[id] || false}
-            onClose={() => handleDropdownToggle(id)}
-            onView={() => handleView(id)}
-            onEdit={() => handleEdit(id)}
-            onDelete={() => handleDelete(id)}
+            isOpen={openDropdowns[scenarioId] || false}
+            onClose={() => handleDropdownToggle(scenarioId)}
+            onView={() => handleView(scenarioId)}
+            onEdit={() => handleEdit(name, scenarioId)}
+            onDelete={() => handleDelete(scenarioId)}
           />
         </div>
       </div>

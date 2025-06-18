@@ -27,17 +27,15 @@ export const getScenarioList = async (
   page: number,
   size: number,
   childId: string,
-  chatbotId: string
+  chapterId: string
 ): Promise<ScenarioList> => {
   try {
     const response = await apiClient.post<ScenarioList>("/api/chatbot/items", {
       page,
       size,
       childId,
-      chatbotId,
+      chapterId,
     });
-
-    console.log("시나리오 목록", response.data);
 
     return response.data;
   } catch (error) {

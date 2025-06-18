@@ -1,7 +1,7 @@
 import { useState } from "react";
 import arrow_down from "../../assets/image/common/arrow-down.png";
 import arrow_right from "../../assets/image/common/arrow-right.png";
-import type { TurnState } from "../../page/invest/chat-bot";
+import type { TurnState } from "../../page/invest/scenario-select/ChatBot";
 
 export default function ChatTurnSideModal({
   turns,

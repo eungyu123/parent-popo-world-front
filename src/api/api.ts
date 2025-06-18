@@ -91,6 +91,7 @@ apiClient.interceptors.response.use(
         const refreshToken = Cookies.get("refreshToken");
         if (refreshToken) {
           // 리프레시 토큰으로 새로운 액세스 토큰 요청
+          console.log("refreshToken", refreshToken);
           return apiClient
             .post("/auth/token/refresh", { refreshToken })
             .then((response) => {

@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 export const ScenarioCreateModal = ({
   scenarioId,
   selectedTheme,
   setSenarioCreateModalOpen,
+  chatbotOpen,
+  setSelectedScenarioId,
 }: {
   scenarioId: string;
   selectedTheme: string;
   setSenarioCreateModalOpen: (open: boolean) => void;
+  chatbotOpen: () => void;
+  setSelectedScenarioId: (id: string) => void;
 }) => {
   const [scenario, setScenario] = useState("");
   return (
@@ -32,14 +35,20 @@ export const ScenarioCreateModal = ({
       </div>
 
       <div className="flex gap-x-2 mt-2 justify-end">
-        <Link
-          to={`/invest/chat-bot?scenarioType=${selectedTheme}&scenarioName=${scenario}&scenarioId=${scenarioId}`}
+        <button
           className="px-4 py-2 text-xs text-white bg-gray-900 rounded hover:bg-gray-800"
+          onClick={() => {
+            setSenarioCreateModalOpen(false);
+            setSelectedScenarioId(scenarioId);
+            chatbotOpen();
+          }}
         >
           생성
-        </Link>
+        </button>
         <button
-          onClick={() => setSenarioCreateModalOpen(false)}
+          onClick={() => {
+            setSenarioCreateModalOpen(false);
+          }}
           className=" px-4 py-2 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200"
         >
           취소

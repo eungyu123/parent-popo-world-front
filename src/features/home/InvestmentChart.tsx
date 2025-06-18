@@ -12,8 +12,6 @@ type LabelListProps = {
 };
 
 export const InvestmentChart: React.FC = () => {
-  const [selectedChild, setSelectedChild] = useState("자녀 1");
-
   const childrenData = [
     { name: "공격적", value: 14 },
     { name: "안정적", value: 11 },
@@ -32,11 +30,11 @@ export const InvestmentChart: React.FC = () => {
       <div className="rounded-2xl shadow-lg bg-main-white-500 border border-gray-100 p-4 w-full max-w-md ">
         <div className="flex justify-between items-center mb-3">
           <h4 className="text-lg font-bold">모의투자 게임 자녀 분석</h4>
-          <Link to="/invest/analyze">
+          <Link to="/invest/scenario-select">
             <img src={rightArrow} alt="" className="w-4 h-4 object-contain" />
           </Link>
         </div>
-        <ChildNavBar selectedColor={"#000000"} selectedChild={selectedChild} setSelectedChild={setSelectedChild} />
+        <ChildNavBar selectedColor={"#000000"} />
         <div className="h-72 flex items-end">
           <ResponsiveContainer className="w-full h-full">
             <BarChart data={childrenData} barCategoryGap={20}>

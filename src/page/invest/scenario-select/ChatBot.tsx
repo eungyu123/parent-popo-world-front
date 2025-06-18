@@ -8,7 +8,7 @@ import { ChatBotHeader } from "../../../components/header/header";
 import ChatMessage from "../../../features/invest/ChatMessage";
 import ChatOutModal from "../../../features/invest/ChatOutModal";
 import ChatTurnSideModal from "../../../features/invest/ChatTurnSideModal";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ArrowUp from "../../../components/icons/ArrowUp";
 import { editScenario } from "../../../api/invest/edit-scenario";
 import { EventSourcePolyfill } from "event-source-polyfill";
@@ -94,15 +94,26 @@ interface ChatMessage {
   isTeacher: boolean;
 }
 
-export const InvestChatBotPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const scenarioType = searchParams.get("scenarioType") || "";
-  const scenarioName = searchParams.get("scenarioName") || "";
-  const scenarioId = searchParams.get("scenarioId") || "";
+interface InvestChatBotProps {
+  scenarioType: string;
+  scenarioName: string;
+  scenarioId: string;
+  closeModal: () => void;
+  turns?: TurnState[] | null;
+}
+
+export const InvestChatBot: React.FC<InvestChatBotProps> = ({
+  scenarioType,
+  scenarioName,
+  scenarioId,
+  closeModal,
+  turns,
+}) => {
+  console.log("scenarioId", scenarioId);
+
   const { selectedChildId } = useAuthStore();
 
-  const [turnData, setTurnData] = useState<TurnState[]>(initialTurns);
+  const [turnData, setTurnData] = useState<TurnState[]>(turns || initialTurns);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSend, setIsSend] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -110,6 +121,7 @@ export const InvestChatBotPage: React.FC = () => {
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
 
   let eventSource: EventSourcePolyfill | null = null;
   useEffect(() => {
@@ -134,11 +146,9 @@ export const InvestChatBotPage: React.FC = () => {
       // 메시지 이벤트 리스너
       eventSource.addEventListener("chatbot", (event: any) => {
         try {
-          console.log(event, event.data);
           const data = JSON.parse(event.data);
-          console.log("Received chatbot:", data);
-          const chapterId = data.chapterId;
-          const isCustom = data.isCustom;
+          // const chapterId = data.chapterId;
+          // const isCustom = data.isCustom;
           const story: StroyState[] = JSON.parse(data.story);
           const turns: TurnState[] = story.map((turn) => ({
             title: turn.turn_number.toString(),
@@ -159,6 +169,7 @@ export const InvestChatBotPage: React.FC = () => {
         console.error("SSE 연결 에러 - URL:", eventSource?.url);
         console.error("SSE 연결 에러 - 전체 에러:", event);
         eventSource?.close();
+        setIsConnected(false);
       });
 
       eventSource.addEventListener("connect", (event: any) => {
@@ -168,9 +179,11 @@ export const InvestChatBotPage: React.FC = () => {
       // 연결 성공 이벤트 리스너
       eventSource.addEventListener("open", () => {
         console.log("SSE 연결 성공 - URL:", eventSource?.url);
+        setIsConnected(true);
       });
     } catch (error) {
       console.error("챗봇 초기화 중 에러 발생:", error);
+      setIsConnected(false);
     }
     // cleanup 함수
     return () => {
@@ -179,7 +192,7 @@ export const InvestChatBotPage: React.FC = () => {
         eventSource.close();
       }
     };
-  }, [eventSource]);
+  }, [isConnected, scenarioId]);
 
   const handleSendMessage = () => {
     if (!inputRef.current?.textContent?.trim() || isLoading) return;
@@ -204,44 +217,55 @@ export const InvestChatBotPage: React.FC = () => {
     }
   };
 
+  const handleSaveScenario = async () => {
+    if (selectedChildId) {
+      const result = await saveScenario(selectedChildId);
+      if (result) {
+        console.log("saveScenario", result);
+        closeModal();
+      }
+    }
+  };
+
   return (
     <>
-      {/* 시나리오 종류 */}
+      {/* 챗봇 나가기 모달 */}
       <Modal isOpen={senarioCreateModalOpen} onClose={() => setSenarioCreateModalOpen(false)}>
-        <ChatOutModal setSenarioCreateModalOpen={setSenarioCreateModalOpen} />
+        <ChatOutModal
+          setSenarioCreateModalOpen={setSenarioCreateModalOpen}
+          onClick={() => {
+            closeModal();
+          }}
+        />
       </Modal>
+      {/* 사이드바 */}
       <SideModal isOpen={senarioModalOpen} onClose={() => setSenarioModalOpen(false)}>
         <ChatTurnSideModal
           turns={turnData}
           scenarioColor={themes[scenarioType].color}
           selectedTheme={scenarioType}
-          scenarioName={scenarioName || ""}
+          scenarioName={scenarioName}
           setSenarioModalOpen={setSenarioModalOpen}
           quitButtonOnClick={() => {
-            if (selectedChildId) {
-              saveScenario(selectedChildId);
-            }
-            navigate("/invest/scenario-select");
+            handleSaveScenario();
           }}
         />
       </SideModal>
-      <>
-        {/* 헤더 */}
-        <ChatBotHeader
-          title={`${scenarioName}`}
-          onClick={() => {}}
-          backButtonOnClick={() => {
-            setSenarioCreateModalOpen(true);
-          }}
-          noteButtonOnClick={() => {
-            setSenarioModalOpen(true);
-          }}
-        />
-        <div className="absolute top-18 right-7 text-[0.625rem] px-1 py-0.5 bg-white rounded-xl shadow-custom-2 border border-gray-100">
-          턴
-        </div>
-        <ChildNavBar selectedColor={"#000000"} />
-      </>
+      {/* 헤더 */}
+      <ChatBotHeader
+        title={`${scenarioName}`}
+        onClick={() => {}}
+        backButtonOnClick={() => {
+          setSenarioCreateModalOpen(true);
+        }}
+        noteButtonOnClick={() => {
+          setSenarioModalOpen(true);
+        }}
+      />
+      <div className="absolute top-18 right-7 text-[0.625rem] px-1 py-0.5 bg-white rounded-xl shadow-custom-2 border border-gray-100">
+        턴
+      </div>
+      <ChildNavBar selectedColor={"#000000"} />
       {/* 채팅 리스트 */}
       <div className="flex flex-col gap-y-3 overflow-y-auto h-[calc(100vh-20.5rem)]">
         {messages.length > 0 ? (
