@@ -6,7 +6,7 @@ import { PurchaseRequestPage } from "./page/store/purchase-request";
 import { StoreLayout } from "./page/store/layout";
 import { QuestLayout } from "./page/quest/layout";
 import { BaseLayout } from "./page/layout";
-import { InvestLayout } from "./page/invest/layout";
+// import { InvestLayout } from "./page/invest/layout";
 import { InvestAnalyzePage } from "./page/invest/invest-analyze";
 import { AuthLayout } from "./page/auth/layout";
 import { SignInPage } from "./page/auth/sign-in";
@@ -34,7 +34,7 @@ function App() {
               <Route path="scenario-select" element={<InvestScenarioSelectPage />} />
             </Route>
             {/* 모의투자 레이아웃(헤더) 얘는 다른거라서 따로 빼둠 */}
-            <Route path="/invest/chat-bot" element={<InvestChatBotPage />} />
+            {/* <Route path="/invest/chat-bot" element={<InvestChatBotPage />} /> */}
 
             {/* 퀘스트 */}
             <Route path="/quest" element={<QuestLayout />}>
