@@ -4,6 +4,7 @@ import { ProductManagementPage } from "./page/store/product-management";
 import { PurchaseManagementPage } from "./page/store/purchase-management";
 import { PurchaseRequestPage } from "./page/store/purchase-request";
 import { StoreLayout } from "./page/store/layout";
+import { QuestLayout } from "./page/quest/layout";
 import { BaseLayout } from "./page/layout";
 import { InvestLayout } from "./page/invest/layout";
 import { InvestAnalyzePage } from "./page/invest/invest-analyze";
@@ -12,6 +13,8 @@ import { SignInPage } from "./page/auth/sign-in";
 import { SignUpPage } from "./page/auth/sign-up";
 import { InvestScenarioSelectPage } from "./page/invest/scenario-select";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
+import { QuestListPage } from "./page/quest/quest-list";
+import { CreateQuestPage } from "./page/quest/create-quest";
 
 function App() {
   return (
@@ -29,6 +32,15 @@ function App() {
             {/* 모의투자 */}
             <Route path="/invest">
               <Route path="scenario-select" element={<InvestScenarioSelectPage />} />
+            </Route>
+            {/* 모의투자 레이아웃(헤더) 얘는 다른거라서 따로 빼둠 */}
+            <Route path="/invest/chat-bot" element={<InvestChatBotPage />} />
+
+            {/* 퀘스트 */}
+            <Route path="/quest" element={<QuestLayout />}>
+              <Route path="create-quest" element={<CreateQuestPage />} />
+              <Route path="quest-list" element={<QuestListPage/>}/>
+              
             </Route>
             {/* 분석센터 */}
             <Route path="/analyze">
