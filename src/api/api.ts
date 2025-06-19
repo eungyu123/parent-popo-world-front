@@ -80,6 +80,12 @@ apiClient.interceptors.response.use(
       return Promise.reject(new ApiError(0, "네트워크 연결을 확인해주세요."));
     }
 
+    if (error.config?.url?.includes("/auth/token/refresh")) {
+      Cookies.remove("refreshToken");
+      useAuthStore.getState().logout();
+      return Promise.reject(new ApiError(401, "인증이 필요합니다."));
+    }
+
     const { status } = error.response;
 
     // 2. HTTP 상태 코드별 에러 처리
@@ -90,12 +96,18 @@ apiClient.interceptors.response.use(
         // 토큰 만료 시 리프레시 토큰으로 재시도
         const refreshToken = Cookies.get("refreshToken");
         if (refreshToken) {
-          // 리프레시 토큰으로 새로운 액세스 토큰 요청
-          console.log("refreshToken", refreshToken);
           return apiClient
             .post("/auth/token/refresh", {}, { headers: { "Refresh-Token": refreshToken } })
             .then((response) => {
               const newAccessToken = response.headers["authorization"];
+              const newRefreshToken = response.headers["refresh-token"];
+              if (newRefreshToken) {
+                Cookies.set("refreshToken", newRefreshToken, {
+                  expires: 14,
+                  secure: true,
+                  sameSite: "strict",
+                });
+              }
               if (newAccessToken) {
                 const token = newAccessToken.replace("Bearer ", "");
                 useAuthStore.getState().setAccessToken(token);
@@ -111,13 +123,13 @@ apiClient.interceptors.response.use(
             .catch(() => {
               // 리프레시 토큰도 만료된 경우 로그아웃 처리
               Cookies.remove("refreshToken");
-              window.location.href = "/auth/sign-in";
+              useAuthStore.getState().logout();
               return Promise.reject(new ApiError(401, "인증이 필요합니다."));
             });
         }
         // 리프레시 토큰이 없는 경우 로그아웃
         Cookies.remove("refreshToken");
-        window.location.href = "/auth/sign-in";
+        useAuthStore.getState().logout();
         return Promise.reject(new ApiError(status, "인증이 필요합니다."));
       }
       case 403:
