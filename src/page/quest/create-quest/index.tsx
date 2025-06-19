@@ -4,6 +4,7 @@ import apiClient from "../../../api/api";
 import { useAuthStore } from "../../../zustand/auth";
 import { Modal } from "../../../components/modal/Modal";
 import { CategoryDropdown } from "../../../features/quest/CategoryDropdown";
+import { IMAGE_URLS } from "../../../constants/constants";
 
 export const CreateQuestPage = () => {
   const [name, setName] = useState("");
@@ -147,6 +148,7 @@ export const CreateQuestPage = () => {
           <input
             type="date"
             value={deadline}
+            min={new Date().toISOString().split("T")[0]}
             onChange={(e) => setDeadline(e.target.value)}
             className="w-full px-4 py-2 bg-[#fffdf9] rounded-xl mb-4
                        border border-gray-300
@@ -201,7 +203,9 @@ export const CreateQuestPage = () => {
           className="bg-white w-80 rounded-3xl p-6 shadow-xl text-center relative"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="text-4xl mb-3">🎉</div>
+          <div className="justify-center mb-1 flex">
+            <img src={IMAGE_URLS.quest.popo} alt="포포" className="w-[5rem]" />
+          </div>
           <h2 className="text-xl font-bold text-gray-800 mb-2">
             퀘스트 생성 완료!
           </h2>

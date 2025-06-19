@@ -158,10 +158,10 @@ export const QuestListPage = () => {
         ))}
       </div>
 
-      {/* 퀘스트 리스트 박스 */}
-      <div className="max-w-xl mx-auto mt-4 px-4 py-4 h-[36rem] overflow-y-scroll rounded-3xl border border-[#57320822] shadow-md bg-white">
-        {/* 상태 필터: 가로 스크롤 */}
-        <div className="overflow-x-auto scrollbar-hide mb-4">
+      {/* 퀘스트 리스트 박스 (스크롤은 여기서 분리) */}
+      <div className="max-w-xl mx-auto mt-4 px-4 py-4 rounded-3xl border border-[#57320822] shadow-md bg-white">
+        {/* 상태 필터: 스크롤 영역 밖 */}
+        <div className="overflow-x-auto scrollbar-hidden mb-4">
           <div className="flex gap-2 min-w-max whitespace-nowrap pr-4">
             {stateFilterList.map(({ label, value, color }) => (
               <button
@@ -182,16 +182,25 @@ export const QuestListPage = () => {
           </div>
         </div>
 
-        {/*  퀘스트 카드들 */}
-        <div className="space-y-3">
+        {/* 스크롤 되는 부분: 퀘스트 카드 리스트만 */}
+        <div className="h-[29rem] overflow-y-scroll scrollbar-hidden space-y-3">
           {!loading &&
             !error &&
-            questData
-              .filter(
+            (() => {
+              const filteredQuests = questData.filter(
                 (quest) =>
                   selectedState === "null" || quest.state === selectedState
-              )
-              .map((quest) => (
+              );
+
+              if (filteredQuests.length === 0) {
+                return (
+                  <div className="flex justify-center items-center text-gray-400 text-sm h-full bg-[#b4b4b424] rounded-xl">
+                    해당 상태의 퀘스트가 없습니다
+                  </div>
+                );
+              }
+
+              return filteredQuests.map((quest) => (
                 <QuestCard
                   key={quest.quest_id}
                   quest={quest}
@@ -203,7 +212,9 @@ export const QuestListPage = () => {
                     )
                   }
                 />
-              ))}
+              ));
+            })()}
+
           {loading && (
             <div className="text-center text-gray-500 mt-10">로딩 중...</div>
           )}
@@ -213,6 +224,7 @@ export const QuestListPage = () => {
         </div>
       </div>
 
+      {/* 모달 */}
       <ConfirmModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
