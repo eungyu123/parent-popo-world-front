@@ -1,20 +1,21 @@
-import apiClient, { ApiError } from "../api";
-export interface StoreItem {
+import apiClient from "../api";
+
+export interface __ProductItem {
   id: string;
   name: string;
   price: number;
   quantity: number;
   type: string;
   imageUrl: string;
+  label: string;
 }
-
-export const getStoreItems = async (childId: string): Promise<StoreItem[]> => {
+export const getStoreItems = async (childId: string): Promise<__ProductItem[]> => {
   try {
     const response = await apiClient.get(`/api/store/parent/products?childId=${childId}`);
     if (response.status !== 200) {
       throw new Error("Failed to fetch store items");
     }
-    console.log("response", response.data);
+    console.log("getStoreItems", response.data);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch store items", error);

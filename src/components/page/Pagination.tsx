@@ -1,6 +1,6 @@
 import React from "react";
-import ArrowLeft from "../../components/icons/ArrowLeft";
-import ArrowRight from "../../components/icons/ArrowRight";
+import ArrowLeft from "../icons/ArrowLeft";
+import ArrowRight from "../icons/ArrowRight";
 
 interface PaginationProps {
   currentPage: number;

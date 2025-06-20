@@ -40,7 +40,6 @@ function App() {
             <Route path="/quest" element={<QuestLayout />}>
               <Route path="create-quest" element={<CreateQuestPage />} />
               <Route path="quest-list" element={<QuestListPage/>}/>
-              
             </Route>
             {/* 분석센터 */}
             <Route path="/analyze">

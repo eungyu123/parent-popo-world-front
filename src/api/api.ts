@@ -74,7 +74,7 @@ apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     // 1. 네트워크 에러 처리
     if (!error.response) {
       return Promise.reject(new ApiError(0, "네트워크 연결을 확인해주세요."));
@@ -88,50 +88,49 @@ apiClient.interceptors.response.use(
 
     const { status } = error.response;
 
+    if (status === 401) {
+      try {
+        // refresh 토큰으로 새로운 access 토큰 발급 요청
+        const refreshToken = Cookies.get("refreshToken");
+        if (!refreshToken) {
+          throw new Error("Refresh token not found");
+        }
+
+        const response = await apiClient.post(
+          `/auth/token/refresh`,
+          {}, // 빈 body
+          {
+            withCredentials: true,
+            headers: {
+              "Refresh-Token": refreshToken,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const accessToken = response.headers["authorization"]?.replace("Bearer ", "");
+        if (accessToken) {
+          useAuthStore.getState().setAccessToken(accessToken);
+        }
+
+        // 새로운 access 토큰으로 원래 요청 재시도
+        if (error.config) {
+          error.config.headers.Authorization = `Bearer ${accessToken}`;
+          return apiClient(error.config);
+        }
+      } catch (refreshError) {
+        // refresh 토큰도 만료된 경우
+        Cookies.remove("refreshToken");
+        useAuthStore.getState().logout();
+
+        return Promise.reject(new ApiError(401, "세션이 만료되었습니다. 다시 로그인해주세요."));
+      }
+    }
+
     // 2. HTTP 상태 코드별 에러 처리
     switch (status) {
       case 400:
         return Promise.reject(new ApiError(status, "잘못된 요청입니다."));
-      case 401: {
-        // 토큰 만료 시 리프레시 토큰으로 재시도
-        const refreshToken = Cookies.get("refreshToken");
-        if (refreshToken) {
-          return apiClient
-            .post("/auth/token/refresh", {}, { headers: { "Refresh-Token": refreshToken } })
-            .then((response) => {
-              const newAccessToken = response.headers["authorization"];
-              const newRefreshToken = response.headers["refresh-token"];
-              if (newRefreshToken) {
-                Cookies.set("refreshToken", newRefreshToken, {
-                  expires: 14,
-                  secure: true,
-                  sameSite: "strict",
-                });
-              }
-              if (newAccessToken) {
-                const token = newAccessToken.replace("Bearer ", "");
-                useAuthStore.getState().setAccessToken(token);
-                // 원래 요청 재시도
-                const originalRequest = error.config;
-                if (originalRequest) {
-                  originalRequest.headers["Authorization"] = `Bearer ${token}`;
-                  return apiClient(originalRequest);
-                }
-              }
-              throw new ApiError(401, "토큰 갱신에 실패했습니다.");
-            })
-            .catch(() => {
-              // 리프레시 토큰도 만료된 경우 로그아웃 처리
-              Cookies.remove("refreshToken");
-              useAuthStore.getState().logout();
-              return Promise.reject(new ApiError(401, "인증이 필요합니다."));
-            });
-        }
-        // 리프레시 토큰이 없는 경우 로그아웃
-        Cookies.remove("refreshToken");
-        useAuthStore.getState().logout();
-        return Promise.reject(new ApiError(status, "인증이 필요합니다."));
-      }
       case 403:
         // 권한 에러
         return Promise.reject(new ApiError(status, "접근 권한이 없습니다."));

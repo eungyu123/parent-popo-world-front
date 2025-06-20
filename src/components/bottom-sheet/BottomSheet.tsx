@@ -40,7 +40,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose, child
       <div
         className={clsx(
           "fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 transition-all duration-500 ease-in-out",
-          "max-w-md mx-auto",
+          "max-w-md mx-auto max-h-[60vh] overflow-y-auto scrollbar-hidden",
           className
         )}
         style={{

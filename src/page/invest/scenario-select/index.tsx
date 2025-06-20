@@ -11,7 +11,7 @@ import { useAuthStore } from "../../../zustand/auth";
 import { formatDate } from "../../../utils/DateFormatting";
 import { deleteScenario } from "../../../api/invest/delete-scenario";
 import { InvestChatBot, type StroyState, type TurnState } from "./ChatBot";
-import Pagination from "../../../features/invest/Pagination";
+import Pagination from "../../../components/page/Pagination";
 import { Header } from "../../../components/header/header";
 import { ChildNavBar } from "../../../components/nav-bar/ChildNavBar";
 

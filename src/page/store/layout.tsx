@@ -7,7 +7,7 @@ import clsx from "clsx";
 const urls = {
   "product-management": "상품관리",
   "purchase-management": "구매관리",
-  "purchase-request": "사용요청",
+  "purchase-request": "사용확인",
 };
 
 export const StoreLayout: React.FC = () => {
@@ -15,7 +15,6 @@ export const StoreLayout: React.FC = () => {
   const pathname = url.pathname.split("/")[2];
   const [isTabOpen, setIsTabOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(urls[pathname as keyof typeof urls]);
-  const [selectedChild, setSelectedChild] = useState("자녀 1");
   const navigate = useNavigate();
   return (
     <>
@@ -49,7 +48,7 @@ export const StoreLayout: React.FC = () => {
           </ul>
         )}
       </Header>
-      <ChildNavBar selectedColor={"#000000"} selectedChild={selectedChild} setSelectedChild={setSelectedChild} />
+      <ChildNavBar selectedColor={"#000000"} />
       <Outlet />
     </>
   );
