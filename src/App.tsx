@@ -15,6 +15,8 @@ import { InvestScenarioSelectPage } from "./page/invest/scenario-select";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { QuestListPage } from "./page/quest/quest-list";
 import { CreateQuestPage } from "./page/quest/create-quest";
+import { SavingsReportPage} from "./page/savings/report";
+import { SavingsLayout } from "./page/savings/layout";
 
 function App() {
   return (
@@ -44,6 +46,10 @@ function App() {
             {/* 분석센터 */}
             <Route path="/analyze">
               <Route path="invest" element={<InvestAnalyzePage />} />
+            </Route>
+            {/* 저축 리포트 */}
+            <Route path="/savings" element={<SavingsLayout />}>
+              <Route path="report" element={<SavingsReportPage />} />
             </Route>
           </Route>
           {/* 로그인, 회원가입 */}
