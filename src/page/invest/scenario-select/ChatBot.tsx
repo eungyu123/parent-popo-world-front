@@ -8,7 +8,6 @@ import { ChatBotHeader } from "../../../components/header/header";
 import ChatMessage from "../../../features/invest/ChatMessage";
 import ChatOutModal from "../../../features/invest/ChatOutModal";
 import ChatTurnSideModal from "../../../features/invest/ChatTurnSideModal";
-import { useNavigate } from "react-router-dom";
 import ArrowUp from "../../../components/icons/ArrowUp";
 import { editScenario } from "../../../api/invest/edit-scenario";
 import { EventSourcePolyfill } from "event-source-polyfill";
@@ -144,9 +143,9 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
       });
 
       // 메시지 이벤트 리스너
-      eventSource.addEventListener("chatbot", (event: any) => {
+      eventSource.addEventListener("chatbot", (event) => {
         try {
-          const data = JSON.parse(event.data);
+          const data = JSON.parse((event as MessageEvent).data);
           // const chapterId = data.chapterId;
           // const isCustom = data.isCustom;
           const story: StroyState[] = JSON.parse(data.story);
@@ -172,8 +171,8 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
         setIsConnected(false);
       });
 
-      eventSource.addEventListener("connect", (event: any) => {
-        console.log("초기 연결 수신:", event.data); // "connected"
+      eventSource.addEventListener("connect", function (event) {
+        console.log("초기 연결 수신:", (event as MessageEvent).data); // "connected"
       });
 
       // 연결 성공 이벤트 리스너

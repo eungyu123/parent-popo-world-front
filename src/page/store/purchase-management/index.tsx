@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { IMAGE_URLS } from "../../../constants/constants";
 import coinIcon from "@/assets/image/common/common_coin.webp";
-import { ProductChart } from "../../../features/store/ProductChart";
+// import { ProductChart } from "../../../features/store/ProductChart";
 import { useAuthStore } from "../../../zustand/auth";
 import { getApprovedHistory } from "../../../api/market/getApprovedHistory";
 import { getPendingApprove } from "../../../api/market/getPendingApprove";
@@ -183,7 +183,7 @@ export const PurchaseManagementPage: React.FC = () => {
       {/* 구매 건수 리스트 */}
       <div className="flex flex-col gap-y-8 ">
         {/* 구매요청 리스트 */}
-        {currentItems.map((item, index) => (
+        {currentItems.map((item) => (
           <div className="relative flex justify-between items-center ">
             {/* 왼쪽 */}
             <div className="flex items-center gap-x-4">

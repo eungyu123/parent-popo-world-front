@@ -1,7 +1,5 @@
 /* index.css */
 @import "tailwindcss";
-/* 데이지 UI 안쓸거임 삭제해야되는데 귀찮아서 안하는중 */
-@plugin "daisyui";
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hidden {

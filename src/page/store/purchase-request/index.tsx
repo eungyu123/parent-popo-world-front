@@ -4,7 +4,7 @@ import { getPendingApprove } from "../../../api/market/getPendingApprove";
 import { useAuthStore } from "../../../zustand/auth";
 import { approveProduct } from "../../../api/market/approve-product";
 import type { ProductItem } from "../../../api/market/type";
-import clsx from "clsx";
+// import clsx from "clsx";
 import Pagination from "../../../components/page/Pagination";
 
 // 무한 스크롤 구현
