@@ -10,6 +10,7 @@ import { AddButton } from "../../components/button/AddButton";
 import { Modal } from "../../components/modal/Modal";
 import { useAuthStore } from "../../zustand/auth";
 import { HomeQuestCard } from "../../features/home/HomeQuestCard";
+import { HomeSavingsCard } from "../../features/home/HomeSavingsCard";
 
 export const HomePage: React.FC = () => {
   const [isOpenParentCode, setIsOpenParentCode] = useState(false);
@@ -174,6 +175,9 @@ export const HomePage: React.FC = () => {
         <HomeQuestCard />
       </div>
       <InvestmentChart />
+
+      {/* 저축 화면 */}
+      <HomeSavingsCard />
     </>
   );
 };

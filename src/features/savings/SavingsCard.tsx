@@ -1,9 +1,19 @@
 import React from "react";
-import type { SavingsAccount } from "../../api/savings/type";
 import DonutChart from "./DonutChart";
 
 interface SavingsCardProps {
-  savingsInfo: SavingsAccount;
+  savingsInfo: {
+    current: number;
+    goal: number;
+    start: string;
+    end: string;
+    history: Array<{
+      date: string;
+      name: string;
+      amount: number;
+      total: number;
+    }>;
+  };
   onShowHistory: () => void;
 }
 
@@ -11,13 +21,14 @@ const SavingsCard: React.FC<SavingsCardProps> = ({
   savingsInfo,
   onShowHistory,
 }) => {
+  // 목표 달성 보상금 계산 (목표액의 10%)
+  const reward = Math.floor(savingsInfo.goal * 0.1);
+
   return (
-    <div className="w-[20rem] rounded-2xl shadow-md border-gray-200 border-2">
-      {/* 카드 상단 정보 */}
+    <div className="w-[20rem] rounded-2xl shadow-md border-gray-200 border-2 mt-[-2rem]">
       <div className="bg-blue-400 h-[3rem] w-[19.8rem] text-[1.2rem] flex items-center justify-center text-white rounded-t-xl">
         저축 통장
       </div>
-      {/* 현재 저축 금액 라벨 */}
       <div className="bg-white p-4 pb-1 ml-2">
         <div>현재 저축 금액</div>
         <div className="bg-gray-200 w-fit px-2 rounded-md mt-1">
@@ -39,7 +50,7 @@ const SavingsCard: React.FC<SavingsCardProps> = ({
       <div className="bg-white p-4 pb-1 ml-2">
         <div>목표 달성시 보상</div>
         <div className="bg-gray-200 w-fit px-2 rounded-md mt-1">
-          +{savingsInfo.reward}냥
+          +{reward}냥
         </div>
       </div>
       <div className="bg-white p-4 pb-1 ml-2">
