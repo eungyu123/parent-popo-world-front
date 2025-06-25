@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Header } from "../../components/header/header";
 import { ChildNavBar } from "../../components/nav-bar/ChildNavBar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 
 const urls = {
@@ -17,6 +17,11 @@ export const StoreLayout: React.FC = () => {
   const [isTabOpen, setIsTabOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(urls[pathname as keyof typeof urls]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsTabOpen(false);
+  }, [pathname]);
+
   return (
     <>
       <Header title={selectedTab} onClick={() => setIsTabOpen(!isTabOpen)} backButtonOnClick={() => navigate("/")}>
@@ -44,14 +49,6 @@ export const StoreLayout: React.FC = () => {
                 onClick={() => setSelectedTab("사용요청")}
               >
                 사용요청
-              </li>
-            </Link>
-            <Link to="/store/analyze">
-              <li
-                className={clsx("text-xs", selectedTab === "구매분석" ? "text-black font-medium" : "text-gray-400")}
-                onClick={() => setSelectedTab("구매분석")}
-              >
-                구매분석
               </li>
             </Link>
           </ul>

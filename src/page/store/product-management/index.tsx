@@ -113,7 +113,11 @@ export const ProductManagementPage: React.FC = () => {
     <>
       {/* 상품 추가 등록 */}
       <h5 className="text-sm mb-1">상품 등록하기</h5>
-      <AddButton text="상품 추가 등록" onClick={() => setIsAddProductBottomSheetOpen(true)} />
+      <AddButton
+        text="상품 추가 등록"
+        onClick={() => setIsAddProductBottomSheetOpen(true)}
+        className="border-2 border-gray-100 shadow-custom-2  mb-10"
+      />
 
       {/* 상품 조회 */}
       <h5 className="text-sm mb-1">상품 조회하기</h5>

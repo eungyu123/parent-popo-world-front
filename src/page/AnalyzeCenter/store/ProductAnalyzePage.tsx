@@ -3,42 +3,27 @@ import TrendingUpIcon from "../../../components/icons/TrendingUpIcon";
 import AwardIcon from "../../../components/icons/AwardIcon";
 import BookIcon from "../../../components/icons/BookOpenIcon";
 import DollarSignIcon from "../../../components/icons/DollarSignIcon";
-import { WeeklyCategoryTrend } from "./WeeklyCategoryTrend";
-import { WeeklySummaryReport } from "./WeeklySummaryReport";
-import { HourlyPurchasePattern } from "./HourlyPurchasePattern";
-import { WeeklyTopProducts } from "./WeeklyTopProducts";
-import { CategorySpendingRatio } from "./CategorySpendingRatio";
+import { WeeklyCategoryTrend } from "../../../features/analyze/store/WeeklyCategoryTrend";
+import { WeeklySummaryReport } from "../../../features/analyze/store/WeeklySummaryReport";
+import { HourlyPurchasePattern } from "../../../features/analyze/store/HourlyPurchasePattern";
+import { WeeklyTopProducts } from "../../../features/analyze/store/WeeklyTopProducts";
+import { CategorySpendingRatio } from "../../../features/analyze/store/CategorySpendingRatio";
 import { useAuthStore } from "../../../zustand/auth";
-import { useEffect, useState } from "react";
 import { getStoreAnalyze } from "../../../api/analyze/store";
+import { useQuery } from "@tanstack/react-query";
 
 export const ProductAnalyzePage = () => {
   const { selectedChildId } = useAuthStore();
-  const [analyzeData, setAnalyzeData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (selectedChildId) {
-      setLoading(true);
-      getStoreAnalyze({ child_id: selectedChildId })
-        .then((data) => {
-          console.log(data);
-          setAnalyzeData(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError("데이터를 불러오는 중 오류가 발생했습니다.");
-          setLoading(false);
-        });
-    }
-  }, [selectedChildId]);
+  const { data: storeAnalyzeData, isSuccess } = useQuery({
+    queryKey: ["storeAnalyze", selectedChildId],
+    queryFn: () => getStoreAnalyze({ child_id: selectedChildId || "" }),
+    enabled: !!selectedChildId,
+  });
 
-  if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>{error}</div>;
-  if (!analyzeData) return null;
+  const { metrics, weeklyTrend, categoryData, hourlyData, popularProducts, lastUpdated } = storeAnalyzeData || {};
 
-  const { metrics, weeklyTrend, categoryData, hourlyData, popularProducts, lastUpdated } = analyzeData;
+  if (!isSuccess) return null;
 
   return (
     <>

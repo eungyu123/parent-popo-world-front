@@ -103,11 +103,17 @@ export function SignInPage() {
           />
         </div>
         <div className="flex flex-col gap-4 mt-4">
-          <button type="submit" className="w-full h-10 bg-[#FFD905] text-white font-bold rounded-lg">
+          <button
+            type="submit"
+            className="w-full h-10 bg-[#FFD905] text-white font-bold rounded-lg active:scale-95 transition-all duration-100"
+          >
             로그인
           </button>
           <Link to="/auth/sign-up">
-            <button type="button" className="w-full h-10 bg-[#ADCF00] text-white font-bold rounded-lg">
+            <button
+              type="button"
+              className="w-full h-10 bg-[#ADCF00] text-white font-bold rounded-lg active:scale-95 transition-all duration-100"
+            >
               회원가입
             </button>
           </Link>

@@ -1,11 +1,11 @@
 import { useState } from "react";
 // import clsx from "clsx";
-import StayTimeGraph from "./StayTimeGraph";
-import TradingRatioGraph1 from "./TradingRatioGraph1";
-import TradingRatioGraph2 from "./TradingRatioGraph2";
-import TradingRatioGraph3 from "./TradingRatioGraph3";
-import BettingSuccessGraph from "./BettingSuccessGraph";
-import BalanceTrendGraph from "./BalanceTrendGraph";
+import StayTimeGraph from "../../../features/analyze/invest/StayTimeGraph";
+import TradingRatioGraph1 from "../../../features/analyze/invest/TradingRatioGraph1";
+import TradingRatioGraph2 from "../../../features/analyze/invest/TradingRatioGraph2";
+import TradingRatioGraph3 from "../../../features/analyze/invest/TradingRatioGraph3";
+import BettingSuccessGraph from "../../../features/analyze/invest/BettingSuccessGraph";
+import BalanceTrendGraph from "../../../features/analyze/invest/BalanceTrendGraph";
 import { useQuery } from "@tanstack/react-query";
 import { getInvestAnalyze } from "../../../api/analyze/invest";
 import { useAuthStore } from "../../../zustand/auth";
@@ -44,10 +44,6 @@ export const investTypes: Record<string, { title: string; color: string }> = {
     title: "여유자금 추이",
     color: "#FE4A4E",
   },
-  // invest_style: {
-  //   title: "투자 성향",
-  //   color: "#FFBE00",
-  // },
 };
 
 export const InvestAnalyzePage: React.FC = () => {
@@ -55,16 +51,16 @@ export const InvestAnalyzePage: React.FC = () => {
   const [selectedAnalyzePeriod, setSelectedAnalyzePeriod] = useState<"all" | "week">("all");
   const { selectedChildId } = useAuthStore();
 
-  const { data: investAnalyzeData } = useQuery({
-    queryKey: ["investAnalyze", selectedAnalyzeType, selectedAnalyzePeriod],
-    queryFn: () =>
-      getInvestAnalyze({
-        graph: selectedAnalyzeType,
-        range: selectedAnalyzePeriod,
-        selectedChildId: selectedChildId || "",
-      }),
-    enabled: !!selectedAnalyzeType && !!selectedAnalyzePeriod && !!selectedChildId,
-  });
+  // const { data: investAnalyzeData } = useQuery({
+  //   queryKey: ["investAnalyze", selectedAnalyzeType, selectedAnalyzePeriod],
+  //   queryFn: () =>
+  //     getInvestAnalyze({
+  //       graph: selectedAnalyzeType,
+  //       range: selectedAnalyzePeriod,
+  //       selectedChildId: selectedChildId || "",
+  //     }),
+  //   enabled: !!selectedAnalyzeType && !!selectedAnalyzePeriod && !!selectedChildId,
+  // });
 
   const AnalyzeGraph = () => {
     if (selectedAnalyzeType === "avg_stay_time") {
@@ -90,7 +86,6 @@ export const InvestAnalyzePage: React.FC = () => {
 
   return (
     <>
-      <ChildNavBar />
       {/* 분석 종류 */}
       <div className="text-sm mb-2">분석 종류</div>
       <div className="flex gap-x-3.5 pb-2 mb-6  overflow-x-auto scrollbar-hidden">

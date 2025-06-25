@@ -10,10 +10,8 @@ export const getInvestAnalyze = async ({
   selectedChildId: string;
 }) => {
   try {
-    console.log("selectedChildId", selectedChildId);
-    // /api/invest/{graph}/{range}
     const response = await apiClient.post(`/api/invest/${graph}/${range}`, selectedChildId);
-    console.log(response.data);
+    console.log("response.data", response.data);
     return response.data;
   } catch (error) {
     console.error("invest 분석 데이터 조회 중 에러 발생:", error);

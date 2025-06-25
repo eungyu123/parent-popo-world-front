@@ -1,30 +1,27 @@
 import React, { useState } from "react";
 import { ChildCard } from "../../features/home/ChildCard";
-import { StoreCard } from "../../features/home/StoreCard";
-import { QuickIcons } from "../../features/home/QuickIcons";
-import { InvestmentChart } from "../../features/home/InvestmentChart";
 import defaultChildBoyImage from "../../assets/image/common/boy.png";
 import defaultChildGirlImage from "../../assets/image/common/girl.png";
 import { PopoButton } from "../../components/button/popoButton";
-import { AddButton } from "../../components/button/AddButton";
 import { Modal } from "../../components/modal/Modal";
 import { useAuthStore } from "../../zustand/auth";
-import { HomeQuestCard } from "../../features/home/HomeQuestCard";
-import { HomeSavingsCard } from "../../features/home/HomeSavingsCard";
+import { IMAGE_URLS } from "../../constants/constants";
+import type { Child } from "../../zustand/auth";
+import { Link } from "react-router-dom";
+import analyzeCenter from "../../assets/image/common/analyze_center.png";
+import { AddButton } from "../../components/button/AddButton";
+import investIcon from "../../assets/image/common/stock.png";
+import popoStockIcon from "../../assets/image/common/popo_stock.png";
+import storeIcon from "../../assets/image/common/store.png";
+import savingsIcon from "../../assets/image/common/saving.png";
+import questIcon from "../../assets/image/common/quest.png";
 
 export const HomePage: React.FC = () => {
   const [isOpenParentCode, setIsOpenParentCode] = useState(false);
-  const [isOpenChildInfo, setIsOpenChildInfo] = useState(false);
-  const [selectedChild, setSelectedChild] = useState<any>(null);
   const authStorage = localStorage.getItem("auth-storage");
   const authData = authStorage ? JSON.parse(authStorage) : null;
   const parentCode = authData?.state?.user?.parentCode;
-  const { logout, child } = useAuthStore();
-
-  const handleChildClick = (childData: any) => {
-    setSelectedChild(childData);
-    setIsOpenChildInfo(true);
-  };
+  const { logout, child, selectedChildId, setSelectedChildId } = useAuthStore();
 
   return (
     <>
@@ -71,113 +68,142 @@ export const HomePage: React.FC = () => {
         </div>
       </Modal>
 
-      <Modal isOpen={isOpenChildInfo} onClose={() => setIsOpenChildInfo(false)}>
+      {/* 환영 문구 */}
+      <div className="min-h-screen bg-base-300 font-SpoqaHanSansNeo scrollbar-hidden">
         <div
-          className="flex flex-col gap-3 bg-white rounded-3xl px-5 py-4 w-80"
-          onClick={(e) => e.stopPropagation()}
+          className=" py-8.5 mx-auto max-w-md min-h-screen relative bg-cover bg-center bg-no-repeat scrollbar-hidden"
+          style={{ backgroundImage: `url(${IMAGE_URLS.auth.bg})` }}
         >
-          {selectedChild && (
-            <>
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                  <img
-                    src={
-                      selectedChild.sex === "M"
-                        ? defaultChildBoyImage
-                        : defaultChildGirlImage
-                    }
-                    alt="프로필"
-                    className="w-9 h-9 object-contain"
-                  />
+          <div className="flex w-full px-6 mb-7 ml-2">
+            <div className="flex justify-between items-center gap-x-4.5">
+              <PopoButton onClick={() => {}} />
+              <div className="flex">
+                <div className="flex flex-col font-bold text-lg">
+                  <span className="">안녕하세요!</span>
+                  <span className="-mt-1">부모님 환영합니다!</span>
                 </div>
-                <div className="flex flex-col gap-0.5 min-w-0">
-                  <h1 className="text-base font-bold text-gray-800 truncate">
-                    {selectedChild.name}
-                  </h1>
-                  <div className="flex items-center gap-1.5">
-                    <span className="px-1.5 py-0.5 rounded-full text-xs font-medium bg-main-green-100 text-main-green-500">
-                      {selectedChild.sex === "M" ? "남자" : "여자"}
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-500">
-                      {selectedChild.age}세
-                    </span>
+              </div>
+            </div>
+          </div>
+          {/* 자녀 카드 */}
+          <div className="flex pl-7 pr-7 flex-nowrap overflow-x-auto scrollbar-hidden gap-x-3 mb-4">
+            {child.map((child: Child) => (
+              <ChildCard
+                key={child.userId}
+                image={
+                  child.sex === "M"
+                    ? defaultChildBoyImage
+                    : defaultChildGirlImage
+                }
+                child={child}
+                selected={selectedChildId === child.userId}
+                setSelectedChildId={() => setSelectedChildId(child.userId)}
+              />
+            ))}
+          </div>
+
+          <div className="flex flex-col px-6">
+            <AddButton
+              text="자녀 추가 등록"
+              onClick={() => setIsOpenParentCode(true)}
+              className="mb-8"
+            />
+
+            {/* 설명  */}
+            <div className="text-xl font-bold text-black mb-2">
+              자녀와 함께 활동해보세요!
+            </div>
+            {/* 상단 타이틀 */}
+            <div className="relative flex items-center justify-center bg-white/75 rounded-lg mb-2 h-24">
+              <div className="flex items-center gap-x-2">
+                <img src={investIcon} alt="" className="w-12.5" />
+                <div>
+                  <div className="text-base font-bold text-black">
+                    총 투자 분석 레포트!
+                  </div>
+                  <div className="text-sm text-main-gray-500">
+                    자녀의 모든 활동에 대한 분석을 받아보세요
                   </div>
                 </div>
               </div>
-
-              <div className="flex flex-col gap-2 bg-gray-50 rounded-xl p-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">이메일</span>
-                  <span className="text-sm text-gray-800 font-medium truncate max-w-[180px]">
-                    {selectedChild.email}
-                  </span>
+            </div>
+            <div className="relative bg-white/75 rounded-lg mb-2 h-24 px-5 py-4">
+              <div>
+                <div className="text-base font-bold text-black">
+                  총 투자 분석 레포트!
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">가입일</span>
-                  <span className="text-sm text-gray-800 font-medium">
-                    {new Date(selectedChild.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">보유 포인트</span>
-                  <span className="text-sm font-bold text-main-green-500">
-                    {selectedChild.point.toLocaleString()}P
-                  </span>
+                <div className="text-sm text-main-gray-500">
+                  자녀의 모든 활동에 대한 분석을 받아보세요
                 </div>
               </div>
-            </>
-          )}
-        </div>
-      </Modal>
+              <img
+                src={investIcon}
+                alt=""
+                className="absolute bottom-2 right-2 w-12.5"
+              />
+            </div>
 
-      {/* 환영 문구 */}
-      <div className="flex w-full mb-10">
-        <div className="flex justify-between items-center gap-x-6">
-          <PopoButton onClick={() => {}} />
-          <div className="flex">
-            <div className="flex flex-col">
-              <span className="">안녕하세요!</span>
-              <span className="">부모님 환영합니다!</span>
-              <span className="" onClick={logout}>
-                로그아웃
-              </span>
+            {/* 2x2 그리드 */}
+            {/* prettier-ignore */}
+            <div className="grid grid-cols-[5fr_3fr] gap-2 mb-12">
+              <Link to="/invest/scenario-select" className="relative flex flex-col  h-28 bg-white/75 rounded-lg shadow py-3 px-4">
+                <div className="text-base font-bold text-black">모의투자</div>   
+                <div className="text-xs text-main-gray-500">모의투자 시나리오를 만들어보세요</div>
+                <img src={popoStockIcon} alt="" className="absolute bottom-2 right-2 w-12.5" />
+              </Link>
+              <Link to="/store/product-management" className="relative flex flex-col h-28 bg-white/75 rounded-lg shadow py-3 px-3">
+                <div className="text-base font-bold text-black">상점</div>
+                <div className="text-xs text-main-gray-500">상품을 등록하고 내역을 확인하세요</div>
+                <img src={storeIcon} alt="" className="absolute bottom-2 right-2 w-11.5" />
+              </Link>
+              <Link to="/savings/report" className="relative flex flex-col h-28 bg-white/75 rounded-lg shadow py-3 px-4">
+                <div className="text-base font-bold text-black">저축통장</div>
+                <div className="text-xs text-main-gray-500">자녀 저축통장 내역을 확인해보세요</div>
+                <img src={savingsIcon} alt="" className="absolute bottom-2 right-2 w-11.5" />
+              </Link>
+              <Link to="/quest/create-quest" className="relative flex flex-col h-28 bg-white/75 rounded-lg shadow py-3 px-3">
+                <div className="text-base font-bold text-black">퀘스트</div>
+                <div className="text-xs text-main-gray-500">퀘스트를 등록하세요</div>
+                <img src={questIcon} alt="" className="absolute bottom-2 right-2 w-11.5" />
+              </Link>
+            </div>
+            {/* 분석 센터 화면 */}
+            <h2 className="text-xl font-bold text-black mb-2">
+              자녀의 금융 분석결과를 확인하세요!
+            </h2>
+            <Link
+              to="/analyze"
+              className="flex flex-col  w-full bg-white/75 rounded-3xl shadow py-4 px-3"
+            >
+              <img src={analyzeCenter} alt="" className="w-full mb-2" />
+              <div className="text-2xl font-bold text-black mb-1 ml-2">
+                분석센터
+              </div>
+              <div className="flex gap-x-0.5">
+                <div className="text-sm font-light px-3 py-1 bg-[#FFBF63] w-fit rounded-lg text-white ml-2">
+                  모의투자
+                </div>
+                <div className="text-sm font-light px-3 py-1 bg-[#FFBF63] w-fit rounded-lg text-white ml-2">
+                  상점
+                </div>
+                <div className="text-sm font-light px-3 py-1 bg-[#FFBF63] w-fit rounded-lg text-white ml-2">
+                  퀘스트
+                </div>
+              </div>
+            </Link>
+            {/* 네비바 */}
+            <div
+              className="my-10 text-3xl"
+              onClick={() => {
+                console.log("로그아웃");
+                logout();
+              }}
+            >
+              로그아웃
             </div>
           </div>
         </div>
       </div>
-      {/* 자녀 카드 */}
-      {child.map((child) => (
-        <div key={child.userId} onClick={() => handleChildClick(child)}>
-          <ChildCard
-            image={
-              child.sex === "M" ? defaultChildBoyImage : defaultChildGirlImage
-            }
-            name={child.name}
-            gender={child.sex === "M" ? "남자" : "여자"}
-          />
-        </div>
-      ))}
-
-      {/* 자녀 추가 등록 버튼 */}
-      <AddButton
-        text="자녀 추가 등록"
-        onClick={() => setIsOpenParentCode(true)}
-      />
-
-      {/* 상점 화면 */}
-      <div className="flex gap-x-5 justify-between h-60 mb-5">
-        <StoreCard />
-        <QuickIcons />
-      </div>
-
-      {/* 퀘스트 화면 */}
-      <div className="flex gap-x-5 justify-between h-60 mb-5">
-        <HomeQuestCard />
-      </div>
-      <InvestmentChart />
-
-      {/* 저축 화면 */}
-      <HomeSavingsCard />
     </>
   );
 };

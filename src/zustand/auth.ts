@@ -7,7 +7,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-interface Child {
+export interface Child {
   name: string;
   sex: string;
   point: number;

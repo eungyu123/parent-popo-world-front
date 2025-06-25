@@ -1,5 +1,5 @@
 import { LineChart, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line } from "recharts";
-import { investTypes } from "./index";
+import { investTypes } from "../../../page/AnalyzeCenter/invest/index";
 
 // DummyData 배열에 추가
 const BalanceTrendDummyData = [

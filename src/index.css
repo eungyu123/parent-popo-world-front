@@ -139,6 +139,10 @@ body::-webkit-scrollbar {
   --color-main-blue-500: #1db3fb;
   /* 빨강 계열 */
   --color-main-red-500: #ff585c;
+
+  /* 회색 계열 */
+  --color-main-gray-500: #4d4b4d;
+  --color-main-gray-600: #333133;
 }
 
 @utility text-stroke-width-* {

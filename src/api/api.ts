@@ -20,7 +20,7 @@ export class ApiError extends Error {
  * - 기본 헤더: Content-Type: application/json
  */
 
-const API_URL = "http://52.78.53.247:8080";
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const apiClient = axios.create({
   baseURL: API_URL,

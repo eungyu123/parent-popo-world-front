@@ -7,6 +7,8 @@ interface ChildNavBarProps {
 export const ChildNavBar: React.FC<ChildNavBarProps> = ({ selectedColor = "#000000" }) => {
   const { child, selectedChildId, setSelectedChildId } = useAuthStore();
 
+  if (child.length === 0) return null;
+
   return (
     <div className="flex justify-between gap-x-1 mb-8 bg-gray-100 rounded-xl p-1 overflow-x-auto scrollbar-hidden">
       {child.length > 0 &&

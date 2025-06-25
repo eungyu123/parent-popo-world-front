@@ -11,7 +11,7 @@ export const PopoButton: React.FC<PopoButtonProps> = ({ children, onClick = () =
   return (
     <div
       className={clsx(
-        "flex items-center justify-center w-13 h-13 rounded-full bg-white shadow-custom-2 border border-gray-50",
+        "flex items-center justify-center w-15 h-15 rounded-full bg-white shadow-custom-2 border border-gray-50",
         className
       )}
       onClick={onClick}
