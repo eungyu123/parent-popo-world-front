@@ -181,7 +181,11 @@ export const ProductResisterContent = ({
         </div>
         <div
           className="text-center bg-main-white-500 text-black text-sm rounded-xl py-3 shadow-custom-2 active:scale-95 transition-all duration-100"
-          onClick={onClose}
+          onClick={() => {
+            setTimeout(() => {
+              onClose();
+            }, 100);
+          }}
         >
           취소
         </div>

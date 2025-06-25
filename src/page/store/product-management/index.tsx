@@ -82,7 +82,10 @@ export const ProductManagementPage: React.FC = () => {
   };
 
   const handleAddProduct = async () => {
-    if (!selectedChildId || !selectedAddProduct) return;
+    if (!selectedChildId || !selectedAddProduct) {
+      alert("자녀를 선택해주세요");
+      return;
+    }
 
     // 필수 필드 검증
     if (!selectedAddProduct.productName?.trim()) {
