@@ -11,8 +11,10 @@ import { deleteStoreProduct } from "../../../api/market/deleteProduct";
 import { LABEL_LIST } from "../../../api/market/registerProduct";
 import type { ProductItem } from "../../../api/market/type";
 import type { __ProductItem } from "../../../api/market/getStoreItems";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const ProductManagementPage: React.FC = () => {
+  const queryClient = useQueryClient();
   const [isAddProductBottomSheetOpen, setIsAddProductBottomSheetOpen] = useState(false);
   const [isEditProductBottomSheetOpen, setIsEditProductBottomSheetOpen] = useState(false);
   const [selectedAddProduct, setSelectedAddProduct] = useState<ProductItem | null>({
@@ -29,19 +31,47 @@ export const ProductManagementPage: React.FC = () => {
   const [items, setItems] = useState<ProductItem[]>([]);
   const { selectedChildId } = useAuthStore();
 
+  // 상품 조회
+  const { data: storeItems, isSuccess } = useQuery({
+    queryKey: ["storeItems", selectedChildId],
+    queryFn: () => getStoreItems(selectedChildId || ""),
+    enabled: !!selectedChildId,
+  });
+
+  // 상품 추가
+  const createProductMutation = useMutation({
+    mutationFn: (product: ProductItem) =>
+      createStoreProduct({
+        childId: selectedChildId || "",
+        productName: product.productName || "",
+        productPrice: product.price || 0,
+        productImage: product.imageUrl || "",
+        label: product.label || "",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["storeItems", selectedChildId] });
+    },
+  });
+
+  // 상품 삭제
+  const deleteProductMutation = useMutation({
+    mutationFn: (productId: string) => deleteStoreProduct({ childId: selectedChildId || "", productId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["storeItems", selectedChildId] });
+    },
+  });
+
   useEffect(() => {
-    if (!selectedChildId) return;
-    getStoreItems(selectedChildId).then((res) => {
-      const productItems: ProductItem[] = res.map((item: __ProductItem) => ({
-        productId: item.id,
-        productName: item.name,
-        price: item.price,
-        imageUrl: item.imageUrl,
-        label: item.label,
-      }));
-      setItems(productItems);
-    });
-  }, [selectedChildId]);
+    if (!selectedChildId || !storeItems || !isSuccess) return;
+    const productItems: ProductItem[] = storeItems.map((item: __ProductItem) => ({
+      productId: item.id,
+      productName: item.name,
+      price: item.price,
+      imageUrl: item.imageUrl,
+      label: item.label,
+    }));
+    setItems(productItems);
+  }, [selectedChildId, storeItems, isSuccess]);
 
   const handleProductClick = (product: ProductItem) => {
     console.log("handleProductClick", product);
@@ -50,17 +80,16 @@ export const ProductManagementPage: React.FC = () => {
   };
 
   const handleAddProduct = async () => {
-    if (!selectedChildId) return;
+    if (!selectedChildId || !selectedAddProduct) return;
 
-    await createStoreProduct({
-      childId: selectedChildId,
-      productName: selectedAddProduct?.productName || "",
-      productPrice: selectedAddProduct?.price || 0,
-      productImage: selectedAddProduct?.imageUrl || "",
-      label: selectedAddProduct?.label || "",
-    });
-
+    createProductMutation.mutate(selectedAddProduct);
     setIsAddProductBottomSheetOpen(false);
+    setSelectedAddProduct({
+      productName: "",
+      price: 0,
+      imageUrl: IMAGE_URLS.items.donut,
+      label: "",
+    });
   };
 
   const handleCreateProductModalClose = () => {
@@ -75,12 +104,9 @@ export const ProductManagementPage: React.FC = () => {
 
   const handleDeleteProduct = async () => {
     if (!selectedChildId || !selectedProduct) return;
-    const response = await deleteStoreProduct({
-      childId: selectedChildId,
-      productId: selectedProduct?.productId || "",
-    });
-    console.log("삭제 response", response);
+    deleteProductMutation.mutate(selectedProduct.productId || "");
     setIsEditProductBottomSheetOpen(false);
+    setSelectedProduct(null);
   };
 
   return (

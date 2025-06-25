@@ -8,6 +8,7 @@ const urls = {
   "product-management": "상품관리",
   "purchase-management": "구매관리",
   "purchase-request": "사용확인",
+  analyze: "구매분석",
 };
 
 export const StoreLayout: React.FC = () => {
@@ -43,6 +44,14 @@ export const StoreLayout: React.FC = () => {
                 onClick={() => setSelectedTab("사용요청")}
               >
                 사용요청
+              </li>
+            </Link>
+            <Link to="/store/analyze">
+              <li
+                className={clsx("text-xs", selectedTab === "구매분석" ? "text-black font-medium" : "text-gray-400")}
+                onClick={() => setSelectedTab("구매분석")}
+              >
+                구매분석
               </li>
             </Link>
           </ul>

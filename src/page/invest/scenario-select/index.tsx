@@ -21,6 +21,7 @@ interface Theme {
   color: string;
   chapterId: string;
 }
+
 const themes: Record<string, Theme> = {
   "아기돼지 삼형제": {
     id: "1",
@@ -70,7 +71,7 @@ export const InvestScenarioSelectPage: React.FC = () => {
   // 시나리오 조회 모달
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
   // 삭제 모달
-  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   // 챗봇 모달
   const [chatBotOpen, setChatBotOpen] = useState(false);
   // 드롭다운 메뉴 상태 관리
@@ -86,7 +87,7 @@ export const InvestScenarioSelectPage: React.FC = () => {
 
   useEffect(() => {
     if (selectedChildId) {
-      getScenarioList(currentPage, 5, selectedChildId, themes[selectedTheme].chapterId).then((data) => {
+      getScenarioList(currentPage - 1, 5, selectedChildId, themes[selectedTheme].chapterId).then((data) => {
         setScenarioList(data.scenarioList);
         setTotalPages(Number(data.totalPageSize));
         setOpenDropdowns(

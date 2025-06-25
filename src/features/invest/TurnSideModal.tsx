@@ -46,7 +46,7 @@ export function TurnSideModal({
       {/* 시나리오 종류/태그 */}
       <div className="flex gap-x-2 px-6 py-4">
         <span
-          className="px-2 py-1 rounded text-xs font-medium"
+          className="px-2 py-1 rounded text-sm font-medium"
           style={{ backgroundColor: scenarioColor, color: "#fff" }}
         >
           {selectedTheme}

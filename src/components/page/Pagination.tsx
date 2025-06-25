@@ -51,7 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="text-xs px-2 py-1 rounded-sm border border-gray-100 shadow-sm active:scale-95 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="text-sm px-2 py-1 rounded-sm border border-gray-100 shadow-sm active:scale-95 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ArrowLeft />
       </button>
@@ -61,7 +61,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
           key={index}
           onClick={() => typeof page === "number" && onPageChange(page)}
           disabled={typeof page !== "number"}
-          className={`text-xs px-2 py-1 rounded-sm border border-gray-100 shadow-sm active:scale-95 transition-all duration-100 ${
+          className={`text-sm px-2 py-1 rounded-sm border border-gray-100 shadow-sm active:scale-95 transition-all duration-100 ${
             page === currentPage ? "bg-gray-100" : ""
           } ${typeof page !== "number" ? "cursor-default" : ""}`}
         >
@@ -72,7 +72,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="text-xs px-2 py-1 rounded-sm border border-gray-100 shadow-sm active:scale-95 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="text-sm px-2 py-1 rounded-sm border border-gray-100 shadow-sm active:scale-95 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ArrowRight />
       </button>

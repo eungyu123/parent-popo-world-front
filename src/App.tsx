@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HomePage } from "./page/home/home";
 import { ProductManagementPage } from "./page/store/product-management";
 import { PurchaseManagementPage } from "./page/store/purchase-management";
@@ -15,12 +16,23 @@ import { InvestScenarioSelectPage } from "./page/invest/scenario-select";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { QuestListPage } from "./page/quest/quest-list";
 import { CreateQuestPage } from "./page/quest/create-quest";
-import { SavingsReportPage} from "./page/savings/report";
+import { SavingsReportPage } from "./page/savings/report";
 import { SavingsLayout } from "./page/savings/layout";
+import { ProductAnalyzePage } from "./page/store/analyze/ProductAnalyzePage";
+
+// QueryClient 인스턴스 생성
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
           {/* prettier-ignore */}
@@ -30,13 +42,14 @@ function App() {
               <Route path="product-management" element={<ProductManagementPage />} />
               <Route path="purchase-management" element={<PurchaseManagementPage />} />
               <Route path="purchase-request" element={<PurchaseRequestPage />} />
+              <Route path="analyze" element={<ProductAnalyzePage />} />
             </Route>
             {/* 모의투자 */}
             <Route path="/invest">
               <Route path="scenario-select" element={<InvestScenarioSelectPage />} />
             </Route>
             {/* 모의투자 레이아웃(헤더) 얘는 다른거라서 따로 빼둠 */}
-            {/* <Route path="/invest/chat-bot" element={<InvestChatBotPage />} /> */}
+            <Route path="/invest/chat-bot" element={<InvestAnalyzePage />} />
 
             {/* 퀘스트 */}
             <Route path="/quest" element={<QuestLayout />}>
@@ -60,7 +73,7 @@ function App() {
         </Routes>
       </Router>
       <div id="modal-root" />
-    </>
+    </QueryClientProvider>
   );
 }
 

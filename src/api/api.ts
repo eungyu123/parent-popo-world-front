@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { useAuthStore } from "../zustand/auth";
+
 /**
  * API 에러를 처리하기 위한 커스텀 에러 클래스
  */
@@ -117,8 +118,7 @@ apiClient.interceptors.response.use(
           error.config.headers.Authorization = `Bearer ${accessToken}`;
           return apiClient(error.config);
         }
-      } catch (error: unknown) {
-        console.error(error);
+      } catch (refreshError) {
         // refresh 토큰도 만료된 경우
         Cookies.remove("refreshToken");
         useAuthStore.getState().logout();

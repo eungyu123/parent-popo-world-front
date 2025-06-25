@@ -9,12 +9,13 @@ interface StoreProductRequest {
   label: string;
 }
 
+//  간식, 오락, 장난감, 교육 및 문구, 기타
 export const LABEL_LIST = {
   FOOD: "먹이",
   SNACK: "간식",
   ENTERTAINMENT: "오락",
   TOY: "장난감",
-  EDUCATION: "교육",
+  EDUCATION: "교육 및 문구",
   ETC: "기타",
 };
 

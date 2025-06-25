@@ -1,0 +1,28 @@
+const graph4AllDummy = [
+  {
+    userId: "956f51a8-d6a0-4a12-a22b-9da3cdffc879",
+    startedAt: "2025-06-18 14:54:34",
+    avgCashRatio: -0.5483333333333332,
+    avgCashRatioMean: -0.0733333333333333,
+  },
+  {
+    userId: "956f51a8-d6a0-4a12-a22b-9da3cdffc879",
+    startedAt: "2025-06-18 14:51:52",
+    avgCashRatio: -0.10119047619047625,
+    avgCashRatioMean: -0.0733333333333333,
+  },
+  {
+    userId: "956f51a8-d6a0-4a12-a22b-9da3cdffc879",
+    startedAt: "2025-06-18 14:44:09",
+    avgCashRatio: 0.12785714285714286,
+    avgCashRatioMean: -0.0733333333333333,
+  },
+  {
+    userId: "956f51a8-d6a0-4a12-a22b-9da3cdffc879",
+    startedAt: "2025-06-18 13:09:44",
+    avgCashRatio: 0.2283333333333334,
+    avgCashRatioMean: -0.0733333333333333,
+  },
+];
+
+export default graph4AllDummy;

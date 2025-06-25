@@ -1,69 +1,77 @@
 import React, { useEffect, useState } from "react";
 import { IMAGE_URLS } from "../../../constants/constants";
 import coinIcon from "@/assets/image/common/common_coin.webp";
-// import { ProductChart } from "../../../features/store/ProductChart";
 import { useAuthStore } from "../../../zustand/auth";
+import Pagination from "../../../components/page/Pagination";
+import { BottomSheet } from "../../../components/bottom-sheet/BottomSheet";
+// api
 import { getApprovedHistory } from "../../../api/market/getApprovedHistory";
 import { getPendingApprove } from "../../../api/market/getPendingApprove";
 import { getInventory } from "../../../api/market/getInventory";
 import type { ProductItem } from "../../../api/market/type";
 import type { __InventoryItem } from "../../../api/market/getInventory";
-import Pagination from "../../../components/page/Pagination";
-import { BottomSheet } from "../../../components/bottom-sheet/BottomSheet";
-// 무한 스크롤 구현
+import { useQuery } from "@tanstack/react-query";
+// 구매 상태 색상
+const PURCHASE_STATUS = {
+  승인완료: "#78d335",
+  승인대기: "#FFBE00",
+  구매완료: "#1CB0F7",
+};
 
 export const PurchaseManagementPage: React.FC = () => {
+  const todayDate = new Date();
   const { selectedChildId } = useAuthStore();
-  const [items, setItems] = useState<ProductItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedDate, setSelectedDate] = useState<string>("2025.05");
+  const [selectedDate, setSelectedDate] = useState<string>(
+    `${todayDate.getFullYear()}.${(todayDate.getMonth() + 1).toString().padStart(2, "0")}`
+  );
   const [bottomSheetOpen, setBottomSheetOpen] = useState<boolean>(false);
-  const [selectedYear, setSelectedYear] = useState<number>(2025);
+  const [selectedYear, setSelectedYear] = useState<number>(todayDate.getFullYear());
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    if (!selectedChildId) return;
-    const fetchData = async () => {
-      try {
-        const approveHistory: ProductItem[] = await getApprovedHistory(selectedChildId);
-        const updatedApproveHistory: ProductItem[] = approveHistory.map((item) => ({
-          ...item,
-          status: "승인완료",
-          updatedAt: item.usedAt,
-        }));
-        const pendingApprove: ProductItem[] = await getPendingApprove(selectedChildId);
-        const updatedPendingApprove: ProductItem[] = pendingApprove.map((item) => ({
-          ...item,
-          status: "승인대기",
-          updatedAt: item.usedAt,
-        }));
+  // 상품 데이터 조회
+  const fetchPurchaseManagementData = async (childId: string) => {
+    const approveHistory: ProductItem[] = await getApprovedHistory(childId);
+    const updatedApproveHistory: ProductItem[] = approveHistory.map((item) => ({
+      ...item,
+      status: "승인완료",
+      updatedAt: item.usedAt,
+    }));
 
-        const inventory: __InventoryItem[] = await getInventory(selectedChildId);
-        const updatedInventory: ProductItem[] = inventory.map((item) => ({
-          productId: item.productId,
-          productName: item.name,
-          price: item.price,
-          imageUrl: item.imageUrl,
-          status: "구매완료",
-          updatedAt: item.purchasedAt,
-        }));
+    const pendingApprove: ProductItem[] = await getPendingApprove(childId);
+    const updatedPendingApprove: ProductItem[] = pendingApprove.map((item) => ({
+      ...item,
+      status: "승인대기",
+      updatedAt: item.usedAt,
+    }));
 
-        const allItems = [...updatedApproveHistory, ...updatedPendingApprove, ...updatedInventory];
-        allItems.sort((a, b) => {
-          const dateA = new Date(a.updatedAt || "");
-          const dateB = new Date(b.updatedAt || "");
-          return dateB.getTime() - dateA.getTime();
-        });
-        setItems(allItems);
-      } catch (error) {
-        console.error("Failed to fetch data", error);
-      }
-    };
-    fetchData();
-  }, [selectedChildId]);
+    const inventory: __InventoryItem[] = await getInventory(childId);
+    const updatedInventory: ProductItem[] = inventory.map((item) => ({
+      productId: item.productId,
+      productName: item.name,
+      price: item.price,
+      imageUrl: item.imageUrl,
+      status: "구매완료",
+      updatedAt: item.purchasedAt,
+    }));
+
+    const allItems = [...updatedApproveHistory, ...updatedPendingApprove, ...updatedInventory];
+    allItems.sort((a, b) => {
+      const dateA = new Date(a.updatedAt || "");
+      const dateB = new Date(b.updatedAt || "");
+      return dateB.getTime() - dateA.getTime();
+    });
+    return allItems;
+  };
+
+  const { data: items } = useQuery({
+    queryKey: ["purchase-management", selectedChildId],
+    queryFn: () => fetchPurchaseManagementData(selectedChildId || ""),
+    enabled: !!selectedChildId,
+  });
 
   // 날짜 필터링된 아이템들
-  const filteredItems = items.filter((item) => {
+  const filteredItems = items?.filter((item) => {
     const itemDate = new Date(item.updatedAt || "");
     const itemYear = itemDate.getFullYear();
     const itemMonth = itemDate.getMonth() + 1;
@@ -74,10 +82,10 @@ export const PurchaseManagementPage: React.FC = () => {
   });
 
   // 페이지네이션 계산
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const totalPages = Math.ceil((filteredItems?.length || 0) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = filteredItems.slice(startIndex, endIndex);
+  const currentItems = filteredItems?.slice(startIndex, endIndex) || [];
 
   // 페이지 변경 핸들러
   const handlePageChange = (page: number) => {
@@ -118,18 +126,6 @@ export const PurchaseManagementPage: React.FC = () => {
 
   return (
     <>
-      {/* 구매 그래프 제목  */}
-      {/* <div className="flex justify-between items-center mb-4">
-        <span className="text-sm">구매 그래프</span>
-        <div className="flex justify-between items-center gap-x-2">
-          <span className="text-sm text-gray-800">월간</span>
-          <span className="text-sm text-center bg-main-green-700 text-main-white-500 rounded-sm px-2 py-1">주간</span>
-        </div>
-      </div> */}
-      {/* 구매 그래프 */}
-      {/* <ProductChart /> */}
-      {/* 구매 건수 제목 */}
-
       <BottomSheet isOpen={bottomSheetOpen} onClose={() => setBottomSheetOpen(false)}>
         <div className="flex flex-col">
           {/* 년도 선택 */}
@@ -174,7 +170,7 @@ export const PurchaseManagementPage: React.FC = () => {
       <div className="flex justify-between items-center mb-4">
         <span className="text-sm">구매 건수</span>
         <span
-          className="text-[0.8rem] text-center bg-main-green-700 text-main-white-500 rounded-sm px-2 py-1 cursor-pointer"
+          className="text-[0.8rem] text-center text-black border border-gray-300 rounded-sm px-2 py-1 cursor-pointer"
           onClick={() => setBottomSheetOpen(true)}
         >
           {selectedDate.split(".")[0]}년 {selectedDate.split(".")[1]}월
@@ -183,7 +179,7 @@ export const PurchaseManagementPage: React.FC = () => {
       {/* 구매 건수 리스트 */}
       <div className="flex flex-col gap-y-8 ">
         {/* 구매요청 리스트 */}
-        {currentItems.map((item) => (
+        {currentItems.map((item, index) => (
           <div className="relative flex justify-between items-center ">
             {/* 왼쪽 */}
             <div className="flex items-center gap-x-4">
@@ -200,8 +196,13 @@ export const PurchaseManagementPage: React.FC = () => {
             </div>
             {/* 오른쪽 */}
             <div className="flex gap-x-2 items-center">
-              <div className="text-xs text-gray-800">{item.usedAt}</div>
-              <div className="text-xs bg-main-green-700 text-main-white-500 rounded-sm px-2 py-1">{item.status}</div>
+              <div className="text-xs text-gray-700 px-2 py-1 bg-gray-200 rounded-md">{item.usedAt}</div>
+              <div
+                className="text-xs text-main-white-500 rounded-sm px-2 py-1"
+                style={{ backgroundColor: PURCHASE_STATUS[item.status as keyof typeof PURCHASE_STATUS] }}
+              >
+                {item.status}
+              </div>
             </div>
             {/* 아래 선 부모 패딩 좌 2rem, 우 2rem 계산후 반영 */}
             <div className="absolute -bottom-5 -left-8 w-[calc(100%_+_4rem)] h-[0.0625rem] bg-gray-200" />

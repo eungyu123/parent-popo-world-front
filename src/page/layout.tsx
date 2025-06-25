@@ -4,7 +4,7 @@ import { NavBar } from "../components/nav-bar/NavBar";
 export const BaseLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-base-300 font-SpoqaHanSansNeo scrollbar-hidden">
-      <div className="px-8 pt-9 pb-12 mx-auto max-w-md min-h-screen bg-main-white-500 relative overflow-hidden scrollbar-hidden">
+      <div className="px-7 pt-9 pb-12 mx-auto max-w-md min-h-screen bg-main-white-500 relative overflow-hidden scrollbar-hidden">
         <Outlet />
         <NavBar />
       </div>

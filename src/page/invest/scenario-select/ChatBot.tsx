@@ -8,6 +8,7 @@ import { ChatBotHeader } from "../../../components/header/header";
 import ChatMessage from "../../../features/invest/ChatMessage";
 import ChatOutModal from "../../../features/invest/ChatOutModal";
 import ChatTurnSideModal from "../../../features/invest/ChatTurnSideModal";
+import { useNavigate } from "react-router-dom";
 import ArrowUp from "../../../components/icons/ArrowUp";
 import { editScenario } from "../../../api/invest/edit-scenario";
 import { EventSourcePolyfill } from "event-source-polyfill";
@@ -143,9 +144,9 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
       });
 
       // 메시지 이벤트 리스너
-      eventSource.addEventListener("chatbot", (event) => {
+      eventSource.addEventListener("chatbot", (event: any) => {
         try {
-          const data = JSON.parse((event as MessageEvent).data);
+          const data = JSON.parse(event.data);
           // const chapterId = data.chapterId;
           // const isCustom = data.isCustom;
           const story: StroyState[] = JSON.parse(data.story);
@@ -171,8 +172,8 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
         setIsConnected(false);
       });
 
-      eventSource.addEventListener("connect", function (event) {
-        console.log("초기 연결 수신:", (event as MessageEvent).data); // "connected"
+      eventSource.addEventListener("connect", (event: any) => {
+        console.log("초기 연결 수신:", event.data); // "connected"
       });
 
       // 연결 성공 이벤트 리스너
@@ -261,7 +262,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
           setSenarioModalOpen(true);
         }}
       />
-      <div className="absolute top-18 right-7 text-[0.625rem] px-1 py-0.5 bg-white rounded-xl shadow-custom-2 border border-gray-100">
+      <div className="absolute top-18 right-7 text-xs px-1 py-0.5 bg-white rounded-xl shadow-custom-2 border border-gray-100">
         턴
       </div>
       <ChildNavBar selectedColor={"#000000"} />
@@ -290,7 +291,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
               <div className="flex justify-center items-center w-8 h-8 rounded-full bg-main-white-500 border border-gray-100 shadow-custom-2">
                 <img src={theacher_popo} alt={"포포 교수님"} className="w-4/5 h-4/5 object-contain" />
               </div>
-              <div className="text-xs py-2.5 px-2">포포 교수님</div>
+              <div className="text-sm py-2.5 px-2">포포 교수님</div>
             </div>
             <div className="flex space-x-1 ml-10 mt-2">
               <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-[bounce_1s_infinite_0ms]"></div>
@@ -304,7 +305,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
       <div className="absolute flex flex-col-reverse bottom-6 left-8 w-[calc(100%-4rem)] px-4 pt-4 pb-11 bg-main-white-500 rounded-xl shadow-custom-2 border border-gray-100">
         <div
           ref={inputRef}
-          className="overflow-y-auto focus:outline-none text-xs"
+          className="overflow-y-auto focus:outline-none text-sm"
           contentEditable
           onKeyDown={handleKeyPress}
         />

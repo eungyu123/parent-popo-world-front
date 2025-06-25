@@ -1,38 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import coinIcon from "@/assets/image/common/common_coin.webp";
 import { getPendingApprove } from "../../../api/market/getPendingApprove";
 import { useAuthStore } from "../../../zustand/auth";
 import { approveProduct } from "../../../api/market/approve-product";
-import type { ProductItem } from "../../../api/market/type";
-// import clsx from "clsx";
 import Pagination from "../../../components/page/Pagination";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-// 무한 스크롤 구현
 export const PurchaseRequestPage: React.FC = () => {
   const { selectedChildId } = useAuthStore();
-  const [pendingApprovals, setPendingApprovals] = useState<ProductItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const queryClient = useQueryClient();
 
   // 구매요청 리스트 조회
-  useEffect(() => {
-    if (!selectedChildId) return;
-    getPendingApprove(selectedChildId).then((res) => {
-      setPendingApprovals(res);
-    });
-  }, [selectedChildId]);
+  const { data: items } = useQuery({
+    queryKey: ["purchase-request", selectedChildId],
+    queryFn: () => getPendingApprove(selectedChildId || ""),
+    enabled: !!selectedChildId,
+  });
+
+  // 상품 사용 확인 후 리스트 업데이트
+  const approveProductMutation = useMutation({
+    mutationFn: (productId: string) => approveProduct(productId, selectedChildId || ""),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["purchase-request", selectedChildId] });
+      queryClient.invalidateQueries({ queryKey: ["purchase-management", selectedChildId] });
+    },
+  });
 
   // 상품 사용 확인
   const handleApprove = (productId: string) => {
     if (!selectedChildId || !productId) return;
-    approveProduct(productId, selectedChildId);
+    approveProductMutation.mutate(productId);
   };
 
   // 페이지네이션 계산
-  const totalPages = Math.ceil(pendingApprovals.length / itemsPerPage);
+  const totalPages = Math.ceil(items?.length || 0 / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = pendingApprovals.slice(startIndex, endIndex);
+  const currentItems = items?.slice(startIndex, endIndex) || [];
 
   // 페이지 변경 핸들러
   const handlePageChange = (page: number) => {

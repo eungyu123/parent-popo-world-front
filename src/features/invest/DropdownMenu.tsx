@@ -18,7 +18,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpen, onClose, onV
           onView();
           onClose();
         }}
-        className="text-black text-xs whitespace-nowrap hover:bg-gray-100 px-1 py-0.5 rounded"
+        className="text-black text-sm whitespace-nowrap hover:bg-gray-100 px-1 py-0.5 rounded"
       >
         조회
       </button>
@@ -27,7 +27,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpen, onClose, onV
           onEdit();
           onClose();
         }}
-        className="text-black text-xs whitespace-nowrap hover:bg-gray-100 px-1 py-0.5 rounded"
+        className="text-black text-sm whitespace-nowrap hover:bg-gray-100 px-1 py-0.5 rounded"
       >
         수정
       </button>
@@ -36,7 +36,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpen, onClose, onV
           onDelete();
           onClose();
         }}
-        className="text-black text-xs whitespace-nowrap hover:bg-gray-100 px-1 py-0.5 rounded"
+        className="text-black text-sm whitespace-nowrap hover:bg-gray-100 px-1 py-0.5 rounded"
       >
         삭제
       </button>

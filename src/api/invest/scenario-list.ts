@@ -36,7 +36,8 @@ export const getScenarioList = async (
       childId,
       chapterId,
     });
-
+    console.log(page, size, childId, chapterId);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     if (error instanceof ApiError) {

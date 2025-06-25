@@ -1,0 +1,173 @@
+{
+  "metrics": {
+    "thisWeekTotal": 3186,
+    "weeklyChange": 574.1052631578948,
+    "mostPopularCategory": "장난감",
+    "educationRatio": 16.135693215339235,
+    "totalPurchases": 21,
+    "avgPurchaseAmount": 151.71428571428572
+  },
+  "weeklyTrend": [
+    {
+      "day": "일",
+      "간식": 0,
+      "오락": 0,
+      "장난감": 0,
+      "교육": 0,
+      "기타": 0
+    },
+    {
+      "day": "월",
+      "간식": 0,
+      "오락": 0,
+      "장난감": 0,
+      "교육": 0,
+      "기타": 0
+    },
+    {
+      "day": "화",
+      "간식": 0,
+      "오락": 0,
+      "장난감": 0,
+      "교육": 0,
+      "기타": 0
+    },
+    {
+      "day": "수",
+      "간식": 300,
+      "오락": 0,
+      "장난감": 0,
+      "교육": 0,
+      "기타": 0
+    },
+    {
+      "day": "목",
+      "간식": 100,
+      "오락": 200,
+      "장난감": 2000,
+      "교육": 300,
+      "기타": 0
+    },
+    {
+      "day": "금",
+      "간식": 300,
+      "오락": 0,
+      "장난감": 0,
+      "교육": 200,
+      "기타": 0
+    },
+    {
+      "day": "토",
+      "간식": 0,
+      "오락": 0,
+      "장난감": 0,
+      "교육": 0,
+      "기타": 86
+    }
+  ],
+  "categoryData": [
+    {
+      "name": "장난감",
+      "value": 2000,
+      "color": "#45b7d1"
+    },
+    {
+      "name": "간식",
+      "value": 700,
+      "color": "#ff6b6b"
+    },
+    {
+      "name": "교육",
+      "value": 500,
+      "color": "#96ceb4"
+    },
+    {
+      "name": "오락",
+      "value": 200,
+      "color": "#4ecdc4"
+    },
+    {
+      "name": "기타",
+      "value": 86,
+      "color": "#ffeaa7"
+    }
+  ],
+  "hourlyData": [
+    { "hour": "0시", "purchases": 0 },
+    { "hour": "1시", "purchases": 0 },
+    { "hour": "2시", "purchases": 0 },
+    { "hour": "3시", "purchases": 0 },
+    { "hour": "4시", "purchases": 0 },
+    { "hour": "5시", "purchases": 0 },
+    { "hour": "6시", "purchases": 0 },
+    { "hour": "7시", "purchases": 0 },
+    { "hour": "8시", "purchases": 0 },
+    { "hour": "9시", "purchases": 0 },
+    { "hour": "10시", "purchases": 0 },
+    { "hour": "11시", "purchases": 0 },
+    { "hour": "12시", "purchases": 0 },
+    { "hour": "13시", "purchases": 0 },
+    { "hour": "14시", "purchases": 3 },
+    { "hour": "15시", "purchases": 2 },
+    { "hour": "16시", "purchases": 7 },
+    { "hour": "17시", "purchases": 2 },
+    { "hour": "18시", "purchases": 2 },
+    { "hour": "19시", "purchases": 3 },
+    { "hour": "20시", "purchases": 1 },
+    { "hour": "21시", "purchases": 1 },
+    { "hour": "22시", "purchases": 0 },
+    { "hour": "23시", "purchases": 0 }
+  ],
+  "popularProducts": [
+    {
+      "name": "레고",
+      "category": "장난감",
+      "count": 4,
+      "totalAmount": 2000,
+      "avgPrice": 500.0
+    },
+    {
+      "name": "과자",
+      "category": "간식",
+      "count": 4,
+      "totalAmount": 600,
+      "avgPrice": 150.0
+    },
+    {
+      "name": "학습지",
+      "category": "교육",
+      "count": 2,
+      "totalAmount": 600,
+      "avgPrice": 300.0
+    },
+    {
+      "name": "초콜릿",
+      "category": "간식",
+      "count": 1,
+      "totalAmount": 100,
+      "avgPrice": 100.0
+    },
+    {
+      "name": "게임시간",
+      "category": "오락",
+      "count": 2,
+      "totalAmount": 300,
+      "avgPrice": 150.0
+    },
+    {
+      "name": "슬라임",
+      "category": "기타",
+      "count": 1,
+      "totalAmount": 100,
+      "avgPrice": 100.0
+    }
+  ],
+  "alerts": [
+    {
+      "type": "warning",
+      "title": "소비 급증 주의",
+      "message": "이번 주 소비가 574.11% 급증했어요. 소비 패턴을 점검해보세요!"
+    }
+  ],
+  "lastUpdated": "2025-06-19T08:12:08.240131"
+}

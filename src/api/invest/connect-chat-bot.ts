@@ -2,7 +2,7 @@ import { useAuthStore } from "../../zustand/auth";
 import Cookies from "js-cookie";
 import { EventSourcePolyfill } from "event-source-polyfill";
 
-type MessageHandler = (data: string) => void;
+type MessageHandler = (data: any) => void;
 
 export const connectChatBot = (onMessage: MessageHandler) => {
   const token = useAuthStore.getState().accessToken;

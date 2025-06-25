@@ -15,7 +15,7 @@ interface ThemeSelectorProps {
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ bgColor, name, onClick }) => {
   return (
     <div
-      className="px-2 py-1 text-main-white-500 rounded-sm text-xs whitespace-nowrap active:scale-95 transition-all duration-100"
+      className="px-2 py-1 text-main-white-500 rounded-sm text-sm whitespace-nowrap active:scale-95 transition-all duration-100"
       style={{ backgroundColor: bgColor }}
       onClick={onClick}
     >
