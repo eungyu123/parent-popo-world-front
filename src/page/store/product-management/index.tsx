@@ -12,6 +12,7 @@ import { LABEL_LIST } from "../../../api/market/registerProduct";
 import type { ProductItem } from "../../../api/market/type";
 import type { __ProductItem } from "../../../api/market/getStoreItems";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { uploadImageToCloudinary } from "../../../components/cloudinary/cloudinary";
 
 export const ProductManagementPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -20,6 +21,7 @@ export const ProductManagementPage: React.FC = () => {
   const [selectedAddProduct, setSelectedAddProduct] = useState<ProductItem | null>({
     productName: "",
     price: 0,
+    image: null,
     imageUrl: IMAGE_URLS.items.donut,
     label: "",
   });
@@ -82,6 +84,38 @@ export const ProductManagementPage: React.FC = () => {
   const handleAddProduct = async () => {
     if (!selectedChildId || !selectedAddProduct) return;
 
+    // 필수 필드 검증
+    if (!selectedAddProduct.productName?.trim()) {
+      alert("상품 이름을 입력해주세요.");
+      return;
+    }
+
+    if (!selectedAddProduct.label) {
+      alert("상품 카테고리를 선택해주세요.");
+      return;
+    }
+
+    if (!selectedAddProduct.price || selectedAddProduct.price <= 0) {
+      alert("상품 가격을 입력해주세요.");
+      return;
+    }
+
+    if (!selectedAddProduct.imageUrl) {
+      alert("상품 이미지를 선택해주세요.");
+      return;
+    }
+
+    if (selectedAddProduct.image) {
+      const uploaded = await uploadImageToCloudinary(selectedAddProduct.image);
+      if (!uploaded) {
+        alert("이미지 업로드 실패");
+        return;
+      }
+      selectedAddProduct.imageUrl = uploaded;
+    }
+
+    console.log("selectedAddProduct", selectedAddProduct);
+
     createProductMutation.mutate(selectedAddProduct);
     setIsAddProductBottomSheetOpen(false);
     setSelectedAddProduct({
@@ -92,14 +126,19 @@ export const ProductManagementPage: React.FC = () => {
     });
   };
 
-  const handleCreateProductModalClose = () => {
-    setIsAddProductBottomSheetOpen(false);
+  const handleCreateProductModalOpen = () => {
+    setIsAddProductBottomSheetOpen(true);
     setSelectedAddProduct({
       productName: "",
       price: 0,
+      image: null,
       imageUrl: IMAGE_URLS.items.donut,
       label: "",
     });
+  };
+
+  const handleCreateProductModalClose = () => {
+    setIsAddProductBottomSheetOpen(false);
   };
 
   const handleDeleteProduct = async () => {
@@ -115,17 +154,17 @@ export const ProductManagementPage: React.FC = () => {
       <h5 className="text-sm mb-1">상품 등록하기</h5>
       <AddButton
         text="상품 추가 등록"
-        onClick={() => setIsAddProductBottomSheetOpen(true)}
+        onClick={handleCreateProductModalOpen}
         className="border-2 border-gray-100 shadow-custom-2  mb-10"
       />
 
       {/* 상품 조회 */}
       <h5 className="text-sm mb-1">상품 조회하기</h5>
-      <div className="grid grid-cols-3 gap-x-8 gap-y-4">
+      <div className="grid grid-cols-3 gap-x-8 gap-y-4 ">
         {items.map((item) => (
           <div key={item.productId} className="flex flex-col gap-y-2" onClick={() => handleProductClick(item)}>
             <div className="relative flex w-full aspect-square bg-main-white-500 justify-center items-center border-2 border-gray-100 text-lg shadow-custom-2 rounded-xl active:scale-95 transition-all duration-100">
-              <img src={item.imageUrl} alt={item.productName} className="w-1/2 h-1/2 object-contain" />
+              <img src={item.imageUrl || ""} alt={item.productName} className="w-1/2 h-1/2 object-contain" />
               {/* 라벨 */}
               {item.label && (
                 <div className="absolute top-1 right-1 bg-main-green-400 text-main-white-500 text-xs rounded-full px-1 py-0.5">
@@ -165,7 +204,7 @@ export const ProductManagementPage: React.FC = () => {
         {/* 상품 이미지, 이름, 가격 설정 */}
         <div className="grid grid-cols-2 gap-x-2 gap-y-2 mb-5">
           <div className="w-40 h-40 aspect-square bg-main-white-500 flex justify-center items-center border-2 border-gray-100 shadow-custom-2 rounded-xl active:scale-95 transition-all duration-100">
-            <img src={selectedProduct?.imageUrl} alt="" className="w-1/2 h-1/2 object-contain" />
+            <img src={selectedProduct?.imageUrl || ""} alt="" className="w-1/2 h-1/2 object-contain" />
           </div>
           <div className="flex flex-col gap-y-1 py-3">
             <label htmlFor="" className="text-sm text-black">

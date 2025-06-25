@@ -149,6 +149,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
           const data = JSON.parse(event.data);
           // const chapterId = data.chapterId;
           // const isCustom = data.isCustom;
+          console.log(data);
           const story: StroyState[] = JSON.parse(data.story);
           const turns: TurnState[] = story.map((turn) => ({
             title: turn.turn_number.toString(),
@@ -156,7 +157,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
             news: turn.news,
           }));
           setTurnData(turns);
-          setMessages((prev) => [...prev, { message: "응답이 왔습니다. 턴 데이터를 확인하세요", isTeacher: true }]);
+          setMessages((prev) => [...prev, { message: "asd", isTeacher: true }]);
           setIsLoading(false);
         } catch (error) {
           console.error("메시지 파싱 에러:", error);

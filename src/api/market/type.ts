@@ -3,7 +3,8 @@ export interface ProductItem {
   productId?: string;
   productName?: string;
   price?: number;
-  imageUrl?: string;
+  image?: File | null;
+  imageUrl?: string | null;
   childName?: string;
   quantity?: number;
   type?: string;
