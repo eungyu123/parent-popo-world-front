@@ -74,6 +74,7 @@ define(["./workbox-54d0af47"], function (workbox) {
    * requests for URLs in the manifest.
    * See https://goo.gl/S9QRab
    */
+
   workbox.precacheAndRoute(
     [
       {
