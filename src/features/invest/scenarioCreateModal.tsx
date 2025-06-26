@@ -31,7 +31,7 @@ export const ScenarioCreateModal = ({
           onChange={(e) => setScenarioName(e.target.value)}
           type="text"
           placeholder="시나리오 이름을 입력하세요"
-          className="px-3 py-2 border border-gray-300 rounded text-xs focus:outline-none focus:border-gray-900"
+          className="px-3 py-2 border border-gray-300 rounded text-base focus:outline-none focus:border-gray-900"
         />
       </div>
 

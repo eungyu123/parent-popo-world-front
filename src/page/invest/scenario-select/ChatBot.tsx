@@ -16,6 +16,7 @@ import { useAuthStore } from "../../../zustand/auth";
 import Cookies from "js-cookie";
 import theacher_popo from "../../../assets/image/common/teacher_popo.png";
 import { saveScenario } from "../../../api/invest/save-scenario";
+import { QueryClient } from "@tanstack/react-query";
 
 interface Theme {
   id: string;
@@ -100,6 +101,8 @@ interface InvestChatBotProps {
   closeModal: () => void;
   turns?: TurnState[] | null;
 }
+
+const queryClient = new QueryClient();
 
 export const InvestChatBot: React.FC<InvestChatBotProps> = ({
   scenarioType,
@@ -223,8 +226,8 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
   const handleSaveScenario = async () => {
     if (selectedChildId) {
       const result = await saveScenario(selectedChildId, scenarioName);
+      queryClient.invalidateQueries({ queryKey: ["scenarioList"] });
       if (result) {
-        console.log("saveScenario", result);
         closeModal();
       }
     }
@@ -308,7 +311,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
       <div className="absolute flex flex-col-reverse bottom-6 left-8 w-[calc(100%-4rem)] px-4 pt-4 pb-11 bg-main-white-500 rounded-xl shadow-custom-2 border border-gray-100">
         <div
           ref={inputRef}
-          className="overflow-y-auto focus:outline-none text-sm"
+          className="overflow-y-auto focus:outline-none text-base"
           contentEditable
           onKeyDown={handleKeyPress}
         />

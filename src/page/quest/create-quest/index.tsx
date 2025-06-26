@@ -77,15 +77,13 @@ export const CreateQuestPage = () => {
 
         {/* 제목 */}
         <div className="space-y-1">
-          <label className="block font-medium text-gray-800 mb-2 mt-3">
-            제목
-          </label>
+          <label className="block font-medium text-gray-800 mb-2 mt-3">제목</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="예: 방 정리하기"
-            className="w-full px-4 py-2 bg-[#fffdf9] text-sm rounded-xl 
+            className="w-full px-4 py-2 bg-[#fffdf9] text-base rounded-xl 
                        border border-gray-300
                        focus:border-[#ff8861] focus:outline-none focus:ring-0"
           />
@@ -107,18 +105,14 @@ export const CreateQuestPage = () => {
 
         {/* 보상 */}
         <div className="space-y-1">
-          <label className="block font-medium text-gray-800 mb-2">
-            보상 (냥)
-          </label>
+          <label className="block font-medium text-gray-800 mb-2">보상 (냥)</label>
           <input
             type="number"
             min="0"
             value={reward}
-            onChange={(e) =>
-              setReward(e.target.value === "" ? "" : Number(e.target.value))
-            }
+            onChange={(e) => setReward(e.target.value === "" ? "" : Number(e.target.value))}
             placeholder="예: 100"
-            className="w-full px-4 py-2 bg-[#fffdf9] text-sm rounded-xl 
+            className="w-full px-4 py-2 bg-[#fffdf9] text-base rounded-xl 
               border border-gray-300
               focus:border-[#ff8861] focus:outline-none focus:ring-0"
           />
@@ -126,14 +120,12 @@ export const CreateQuestPage = () => {
 
         {/* 사진 */}
         <div className="space-y-1">
-          <label className="block font-medium text-gray-800 mb-2">
-            사진 (선택)
-          </label>
+          <label className="block font-medium text-gray-800 mb-2">사진 (선택)</label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setImage(e.target.files?.[0] ?? null)}
-            className="w-full bg-[#fffdf9] rounded-xl text-sm
+            className="w-full bg-[#fffdf9] rounded-xl text-base
               border border-gray-300
               focus:border-[#ff8861]focus:outline-none focus:ring-0
               file:bg-[#ff8861] file:text-white file:font-semibold file:rounded-md 
@@ -176,9 +168,7 @@ export const CreateQuestPage = () => {
           className="bg-white w-80 rounded-3xl p-6 shadow-xl text-center relative"
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 className="text-xl font-bold text-gray-800 mb-8">
-            모든 항목을 입력해주세요!
-          </h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-8">모든 항목을 입력해주세요!</h2>
 
           <button
             onClick={() => setIsInputMissing(false)}
@@ -195,10 +185,7 @@ export const CreateQuestPage = () => {
         </div>
       </Modal>
       {/* 퀘스트 생성 완료 모달 */}
-      <Modal
-        isOpen={showCompleteModal}
-        onClose={() => setShowCompleteModal(false)}
-      >
+      <Modal isOpen={showCompleteModal} onClose={() => setShowCompleteModal(false)}>
         <div
           className="bg-white w-80 rounded-3xl p-6 shadow-xl text-center relative"
           onClick={(e) => e.stopPropagation()}
@@ -206,12 +193,8 @@ export const CreateQuestPage = () => {
           <div className="justify-center mb-1 flex">
             <img src={IMAGE_URLS.quest.popo} alt="포포" className="w-[5rem]" />
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">
-            퀘스트 생성 완료!
-          </h2>
-          <p className="text-sm text-gray-600 mb-5">
-            아이에게 새로운 퀘스트가 전달되었어요.
-          </p>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">퀘스트 생성 완료!</h2>
+          <p className="text-sm text-gray-600 mb-5">아이에게 새로운 퀘스트가 전달되었어요.</p>
           <button
             onClick={() => setShowCompleteModal(false)}
             className="w-full py-3 rounded-xl bg-[#ff8861] text-white font-semibold  transition"

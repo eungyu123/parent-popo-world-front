@@ -14,6 +14,7 @@ import { InvestChatBot, type StoryState, type TurnState } from "./ChatBot";
 import Pagination from "../../../components/page/Pagination";
 import { Header } from "../../../components/header/header";
 import { ChildNavBar } from "../../../components/nav-bar/ChildNavBar";
+import { QueryClient, useQuery } from "@tanstack/react-query";
 
 interface Theme {
   id: string;
@@ -56,14 +57,14 @@ const DEFAULT_SCENARIO_ID = {
   "달빛 도둑": "07e47c9d-4f9f-46b1-97f4-358bf3144909",
 };
 
+const queryClient = new QueryClient();
+
 export const InvestScenarioSelectPage: React.FC = () => {
   const navigate = useNavigate();
   // 선택된 자녀
   const { selectedChildId } = useAuthStore();
   // 선택된 테마
   const [selectedTheme, setSelectedTheme] = useState(themes["아기돼지 삼형제"].name);
-  // 시나리오 리스트
-  const [scenarioList, setScenarioList] = useState<ScenarioItem[]>([]);
   // 선택된 시나리오 ID
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
   // 시나리오 생성 모달
@@ -82,25 +83,28 @@ export const InvestScenarioSelectPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
+  const { data: scenarioData } = useQuery({
+    queryKey: ["scenarioList", selectedChildId, selectedTheme, currentPage],
+    queryFn: () => getScenarioList(currentPage - 1, 5, selectedChildId || "", themes[selectedTheme].chapterId),
+  });
+
+  // scenarioData가 변경될 때만 상태 업데이트
+  useEffect(() => {
+    if (scenarioData) {
+      setTotalPages(Number(scenarioData.totalPageSize || 0));
+      setOpenDropdowns(
+        scenarioData.scenarioList.reduce((acc: { [key: string]: boolean }, scenario: ScenarioItem) => {
+          acc[scenario.scenarioId] = false;
+          return acc;
+        }, {} as { [key: string]: boolean })
+      );
+    }
+  }, [scenarioData]);
+
   const handleDropdownToggle = (scenarioId: string) => {
     setSelectedScenarioId(scenarioId);
     setOpenDropdowns((prev) => ({ ...prev, [scenarioId]: !prev[scenarioId] }));
   };
-
-  useEffect(() => {
-    if (selectedChildId) {
-      getScenarioList(currentPage - 1, 5, selectedChildId, themes[selectedTheme].chapterId).then((data) => {
-        setScenarioList(data.scenarioList);
-        setTotalPages(Number(data.totalPageSize));
-        setOpenDropdowns(
-          data.scenarioList.reduce((acc, scenario) => {
-            acc[scenario.scenarioId] = false;
-            return acc;
-          }, {} as { [key: string]: boolean })
-        );
-      });
-    }
-  }, [selectedChildId, selectedTheme, currentPage]);
 
   // 자녀가 바뀌면 페이지를 1로 초기화
   useEffect(() => {
@@ -129,9 +133,7 @@ export const InvestScenarioSelectPage: React.FC = () => {
 
   const handleDelete = (scenarioId: string) => {
     deleteScenario(scenarioId).then((result) => {
-      if (result) {
-        console.log("삭제 성공");
-      }
+      queryClient.invalidateQueries({ queryKey: ["scenarioList"] });
     });
   };
 
@@ -154,8 +156,10 @@ export const InvestScenarioSelectPage: React.FC = () => {
         scenarioId={selectedScenarioId || ""}
         closeModal={() => setChatBotOpen(false)}
         turns={
-          scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story
-            ? parseTurns(scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story)
+          scenarioData?.scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story
+            ? parseTurns(
+                scenarioData?.scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story
+              )
             : null
         }
       />
@@ -178,12 +182,14 @@ export const InvestScenarioSelectPage: React.FC = () => {
         </Modal>
         <SideModal isOpen={senarioModalOpen} onClose={() => setSenarioModalOpen(false)}>
           <TurnSideModal
-            turns={parseTurns(scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story) || []}
+            turns={
+              parseTurns(
+                scenarioData?.scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story
+              ) || []
+            }
             scenarioColor={themes[selectedTheme].color}
             selectedTheme={selectedTheme}
-            scenarioName={`${
-              scenarioList.findIndex((scenario) => scenario.scenarioId === selectedScenarioId) + 1
-            }번 시나리오`}
+            scenarioName={scenarioName}
             setSenarioModalOpen={setSenarioModalOpen}
           />
         </SideModal>
@@ -214,8 +220,9 @@ export const InvestScenarioSelectPage: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-y-6 mb-6">
-          {scenarioList.length > 0 &&
-            scenarioList.map((scenario) => {
+          {scenarioData?.scenarioList &&
+            scenarioData?.scenarioList.length > 0 &&
+            scenarioData?.scenarioList.map((scenario) => {
               return (
                 <ScenarioCard
                   key={scenario.scenarioId}

@@ -114,7 +114,7 @@ export const ProductResisterContent = ({
             onChange={(e) =>
               setSelectedAddProduct({ ...selectedAddProduct, productName: e.target.value } as ProductItem)
             }
-            className="pl-2 py-0.5 text-sm text-black border border-gray-100 shadow-custom-2 rounded-md focus:outline-none"
+            className="pl-2 py-0.5 text-base text-black border border-gray-100 shadow-custom-2 rounded-md focus:outline-none"
           />
           <label htmlFor="" className="text-sm text-black mt-3">
             상품 가격
@@ -131,7 +131,7 @@ export const ProductResisterContent = ({
                 price: numericValue === "" ? 0 : Number(numericValue),
               } as ProductItem);
             }}
-            className="pl-2 py-0.5 text-sm text-black border border-gray-100 shadow-custom-2 rounded-md focus:outline-none"
+            className="pl-2 py-0.5 text-base text-black border border-gray-100 shadow-custom-2 rounded-md focus:outline-none"
             placeholder="숫자만 입력"
           />
         </div>
