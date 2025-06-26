@@ -179,7 +179,7 @@ export const PurchaseManagementPage: React.FC = () => {
       {/* 구매 건수 리스트 */}
       <div className="flex flex-col gap-y-8 ">
         {/* 구매요청 리스트 */}
-        {currentItems.map((item, index) => (
+        {currentItems.map((item) => (
           <div className="relative flex justify-between items-center ">
             {/* 왼쪽 */}
             <div className="flex items-center gap-x-4">

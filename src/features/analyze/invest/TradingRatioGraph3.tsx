@@ -71,7 +71,7 @@ export default function TradingRatioGraph3({ TradingRatioData }: { TradingRatioD
           {/* XAxis: x축, 날짜(시작 시각) 표시 */}
           <XAxis
             dataKey="gameId"
-            tick={({ x, y, payload }) => (
+            tick={({ x, y }) => (
               <g transform={`translate(${x},${y})`}>
                 <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="12">
                   &nbsp;&nbsp;&nbsp;나의 투자 비율

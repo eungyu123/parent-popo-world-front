@@ -1,12 +1,4 @@
 import apiClient from "../api";
-import type {
-  StayTimeGraphProps,
-  TradingRatioGraph1Props,
-  TradingRatioGraph2Props,
-  TradingRatioGraph3Props,
-  BettingSuccessGraphProps,
-  BalanceTrendGraphProps,
-} from "../../features/analyze/invest/types";
 
 export const getInvestAnalyze = async ({
   graph,

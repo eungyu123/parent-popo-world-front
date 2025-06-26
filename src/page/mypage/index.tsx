@@ -12,7 +12,7 @@ export const MyPage: React.FC = () => {
   const { logout, child, user } = useAuthStore();
 
   // user 정보를 any로 타입 단언하여 추가 속성에 접근
-  const userInfo = user as any;
+  const userInfo = user as unknown as { name: string; parentCode: string; createdAt: string };
 
   const authStorage = localStorage.getItem("auth-storage");
   const authData = authStorage ? JSON.parse(authStorage) : null;
@@ -51,24 +51,12 @@ export const MyPage: React.FC = () => {
 
   return (
     <>
-      <Modal
-        isOpen={isOpenParentCode}
-        onClose={() => setIsOpenParentCode(false)}
-      >
-        <div
-          className="flex flex-col gap-4 bg-white rounded-3xl p-6 w-72"
-          onClick={(e) => e.stopPropagation()}
-        >
+      <Modal isOpen={isOpenParentCode} onClose={() => setIsOpenParentCode(false)}>
+        <div className="flex flex-col gap-4 bg-white rounded-3xl p-6 w-72" onClick={(e) => e.stopPropagation()}>
           <div className="flex flex-col items-center gap-3">
             <div className="flex items-center gap-2 self-start">
               <div className="w-7 h-7 rounded-full bg-main-green-100 flex items-center justify-center">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
                     d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
                     fill="#4CAF50"
@@ -83,13 +71,9 @@ export const MyPage: React.FC = () => {
             </div>
 
             <div className="w-full bg-gray-50 rounded-xl p-3 text-center">
-              <p className="text-xl font-bold text-main-green-500 tracking-wider">
-                {parentCode}
-              </p>
+              <p className="text-xl font-bold text-main-green-500 tracking-wider">{parentCode}</p>
             </div>
-            <p className="text-sm text-gray-500 text-center">
-              이 코드를 자녀계정에서 입력해주세요
-            </p>
+            <p className="text-sm text-gray-500 text-center">이 코드를 자녀계정에서 입력해주세요</p>
           </div>
         </div>
       </Modal>
@@ -98,9 +82,7 @@ export const MyPage: React.FC = () => {
         <div className="bg-white">
           {/* 헤더 */}
           <div className="px-6 py-4">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">
-              마이페이지
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">마이페이지</h1>
             <p className="text-gray-600">계정 정보와 설정을 관리하세요</p>
           </div>
 
@@ -109,16 +91,10 @@ export const MyPage: React.FC = () => {
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 text-white">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
-                  <img
-                    src={parentsImage}
-                    alt="부모님"
-                    className="w-12 h-12 object-contain"
-                  />
+                  <img src={parentsImage} alt="부모님" className="w-12 h-12 object-contain" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold">
-                    {userInfo?.name || "부모님"}
-                  </h2>
+                  <h2 className="text-xl font-bold">{userInfo?.name || "부모님"}</h2>
                 </div>
               </div>
 
@@ -126,28 +102,21 @@ export const MyPage: React.FC = () => {
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between items-center">
                   <span className="text-blue-200">부모 코드</span>
-                  <span className="font-medium text-white">
-                    {parentCode || "미설정"}
-                  </span>
+                  <span className="font-medium text-white">{parentCode || "미설정"}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-blue-200">등록된 자녀 수</span>
-                  <span className="font-medium text-white">
-                    {child.length}명
-                  </span>
+                  <span className="font-medium text-white">{child.length}명</span>
                 </div>
                 {userInfo?.createdAt && (
                   <div className="flex justify-between items-center">
                     <span className="text-blue-200">가입일</span>
                     <span className="font-medium text-white">
-                      {new Date(userInfo.createdAt).toLocaleDateString(
-                        "ko-KR",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )}
+                      {new Date(userInfo.createdAt).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
                     </span>
                   </div>
                 )}
@@ -168,27 +137,16 @@ export const MyPage: React.FC = () => {
           <h3 className="text-lg font-bold text-gray-800 mb-4">등록된 자녀</h3>
           <div className="space-y-3">
             {child.map((childInfo: Child) => (
-              <div
-                key={childInfo.userId}
-                className="bg-white rounded-xl p-4 shadow-sm"
-              >
+              <div key={childInfo.userId} className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-3">
                   <img
-                    src={
-                      childInfo.sex === "M"
-                        ? defaultChildBoyImage
-                        : defaultChildGirlImage
-                    }
+                    src={childInfo.sex === "M" ? defaultChildBoyImage : defaultChildGirlImage}
                     alt="child"
                     className="w-12 h-12 rounded-full"
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-800">
-                      {childInfo.name}
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      포인트: {childInfo.point}냥
-                    </p>
+                    <h4 className="font-semibold text-gray-800">{childInfo.name}</h4>
+                    <p className="text-sm text-gray-500">포인트: {childInfo.point}냥</p>
                   </div>
                   <div className="text-right">
                     <span className="text-xs text-gray-400">활동 중</span>
@@ -209,9 +167,7 @@ export const MyPage: React.FC = () => {
                 to={menu.path}
                 className={`${menu.bgColor} rounded-xl p-4 transition-transform hover:scale-105`}
               >
-                <h4 className={`font-semibold ${menu.textColor} mb-1`}>
-                  {menu.title}
-                </h4>
+                <h4 className={`font-semibold ${menu.textColor} mb-1`}>{menu.title}</h4>
                 <p className="text-xs text-gray-600">{menu.description}</p>
               </Link>
             ))}

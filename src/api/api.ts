@@ -119,6 +119,7 @@ apiClient.interceptors.response.use(
           return apiClient(error.config);
         }
       } catch (refreshError) {
+        console.error("refreshError", refreshError);
         // refresh 토큰도 만료된 경우
         Cookies.remove("refreshToken");
         useAuthStore.getState().logout();

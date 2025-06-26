@@ -1,22 +1,10 @@
 import { Link } from "react-router-dom";
-import investIcon from "../../assets/image/common/stock.png";
 import popoStockIcon from "../../assets/image/common/popo_stock.png";
 import storeIcon from "../../assets/image/common/store.png";
 import questIcon from "../../assets/image/common/quest.png";
 
 export const AnalyzeCenterPage = () => {
   // 더미 데이터
-  const analysisData = {
-    invest: {
-      title: "모의투자 분석",
-    },
-    store: {
-      title: "상점 분석",
-    },
-    quest: {
-      title: "퀘스트 분석",
-    },
-  };
 
   return (
     <>

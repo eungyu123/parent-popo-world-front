@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList, Cell } from "recharts";
 import rightArrow from "../../assets/image/common/right-arrow.png";
 import { Link } from "react-router-dom";
-import { ChildNavBar } from "../../components/nav-bar/ChildNavBar";
 
 type LabelListProps = {
   x?: number | string;

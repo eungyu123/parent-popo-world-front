@@ -1,5 +1,3 @@
-import React from "react";
-
 interface PopularProduct {
   name: string;
   category: string;

@@ -1,4 +1,4 @@
 declare module "*.csv" {
-  const value: any;
+  const value: unknown;
   export default value;
 }

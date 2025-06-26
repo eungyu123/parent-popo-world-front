@@ -73,7 +73,7 @@ export const InvestScenarioSelectPage: React.FC = () => {
   // 시나리오 조회 모달
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
   // 삭제 모달
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   // 챗봇 모달
   const [chatBotOpen, setChatBotOpen] = useState(false);
   // 드롭다운 메뉴 상태 관리
@@ -215,7 +215,7 @@ export const InvestScenarioSelectPage: React.FC = () => {
 
         <div className="flex flex-col gap-y-6 mb-6">
           {scenarioList.length > 0 &&
-            scenarioList.map((scenario, index) => {
+            scenarioList.map((scenario) => {
               return (
                 <ScenarioCard
                   key={scenario.scenarioId}

@@ -30,13 +30,11 @@ export const SavingsReportPage: React.FC = () => {
         setIsLoading(true);
         const accounts = await fetchSavingsAccounts(selectedChildId);
         // 최신순으로 정렬
-        const sortedAccounts = accounts.sort(
-          (a, b) =>
-            new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
-        );
+        const sortedAccounts = accounts.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
         setSavingsAccounts(sortedAccounts);
         setIsLoading(false);
       } catch (error) {
+        console.log(error);
         setError("저축통장 정보를 불러오는데 실패했습니다.");
         setIsLoading(false);
       }
@@ -48,24 +46,16 @@ export const SavingsReportPage: React.FC = () => {
   }, [selectedChildId]);
 
   if (!selectedChildId) {
-    return (
-      <div className="flex justify-center items-center flex-1 text-gray-500">
-        자녀를 선택해주세요.
-      </div>
-    );
+    return <div className="flex justify-center items-center flex-1 text-gray-500">자녀를 선택해주세요.</div>;
   }
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center flex-1">로딩중...</div>
-    );
+    return <div className="flex justify-center items-center flex-1">로딩중...</div>;
   }
 
   if (error || savingsAccounts.length === 0) {
     return (
-      <div className="flex justify-center items-center flex-1 text-red-500">
-        {error || "저축통장이 없습니다."}
-      </div>
+      <div className="flex justify-center items-center flex-1 text-red-500">{error || "저축통장이 없습니다."}</div>
     );
   }
 
@@ -80,11 +70,7 @@ export const SavingsReportPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center relative flex-1 pt-8">
       {currentIndex > 0 && (
-        <NavigationButton
-          direction="left"
-          onClick={() => setCurrentIndex(currentIndex - 1)}
-          className="left-[-3rem]"
-        />
+        <NavigationButton direction="left" onClick={() => setCurrentIndex(currentIndex - 1)} className="left-[-3rem]" />
       )}
       <SavingsCard
         savingsInfo={{
@@ -97,11 +83,7 @@ export const SavingsReportPage: React.FC = () => {
         }}
         onShowHistory={() => setShowHistory(true)}
       />
-      <SavingsHistoryModal
-        open={showHistory}
-        onClose={() => setShowHistory(false)}
-        history={mappedDeposits}
-      />
+      <SavingsHistoryModal open={showHistory} onClose={() => setShowHistory(false)} history={mappedDeposits} />
       {currentIndex < savingsAccounts.length - 1 && (
         <NavigationButton
           direction="right"

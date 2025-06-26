@@ -1,6 +1,6 @@
 // 체류시간 그래프
 
-import { Legend, XAxis, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, YAxis } from "recharts";
+import { XAxis, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, YAxis } from "recharts";
 import LegendIcon from "../../../components/icons/Legend";
 import { useRef, useState, useEffect } from "react";
 

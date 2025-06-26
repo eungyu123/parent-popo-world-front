@@ -1,4 +1,3 @@
-import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 interface WeeklyTrendData {
@@ -18,10 +17,19 @@ const colors = {
   기타: "#FFEAA7",
 };
 
+interface CustomTopRoundedBarProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
+  payload: { [key: string]: number };
+}
+
 const categories: string[] = ["간식", "오락", "장난감", "교육", "기타"]; // 이 순서대로 stack됨
 
-const CustomTopRoundedBar = (props: any, category: string) => {
-  const { x, y, width, height, fill, index, payload } = props;
+const CustomTopRoundedBar = (props: CustomTopRoundedBarProps, category: string) => {
+  const { x, y, width, height, fill, payload } = props;
 
   const isTopStack = (() => {
     for (let i = categories.length - 1; i >= 0; i--) {
@@ -101,7 +109,7 @@ export const WeeklyCategoryTrend = ({ data }: WeeklyCategoryTrendProps) => {
                 name={category}
                 stackId="a"
                 fill={colors[category as keyof typeof colors]}
-                shape={(props: any) => CustomTopRoundedBar(props, category)}
+                shape={(props: unknown) => CustomTopRoundedBar(props as CustomTopRoundedBarProps, category)}
               />
             ))}
           </BarChart>

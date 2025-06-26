@@ -8,7 +8,6 @@ import { ChatBotHeader } from "../../../components/header/header";
 import ChatMessage from "../../../features/invest/ChatMessage";
 import ChatOutModal from "../../../features/invest/ChatOutModal";
 import ChatTurnSideModal from "../../../features/invest/ChatTurnSideModal";
-import { useNavigate } from "react-router-dom";
 import ArrowUp from "../../../components/icons/ArrowUp";
 import { editScenario } from "../../../api/invest/edit-scenario";
 import { EventSourcePolyfill } from "event-source-polyfill";
@@ -121,7 +120,6 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
 
   const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
 
@@ -179,17 +177,14 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
         console.error("SSE 연결 에러 - URL:", eventSource?.url);
         console.error("SSE 연결 에러 - 전체 에러:", event);
         eventSource?.close();
-        setIsConnected(false);
       });
 
       // 연결 성공 이벤트 리스너
       eventSource.addEventListener("open", () => {
         console.log("SSE 연결 성공 - URL:", eventSource?.url);
-        setIsConnected(true);
       });
     } catch (error) {
       console.error("챗봇 초기화 중 에러 발생:", error);
-      setIsConnected(false);
     }
 
     // cleanup 함수

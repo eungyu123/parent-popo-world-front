@@ -1,6 +1,5 @@
 // 구매 판매 비율 그래프 (실제값/평균값 스택 영역)
 import { Area, AreaChart, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import graph2_1AllDummy from "./graph2_1_all_dummy";
 import { type TradingRatioGraph1Props } from "./types";
 
 // 커스텀 Legend 컴포넌트

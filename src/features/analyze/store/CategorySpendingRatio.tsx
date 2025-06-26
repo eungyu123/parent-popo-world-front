@@ -1,5 +1,3 @@
-import React from "react";
-
 interface Metrics {
   thisWeekTotal: number;
   weeklyChange: number;
