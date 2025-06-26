@@ -92,6 +92,7 @@ export const SavingsReportPage: React.FC = () => {
           goal: currentAccount.goalAmount,
           start: formatDate(currentAccount.createdDate),
           end: formatDate(currentAccount.endDate),
+          status: currentAccount.status,
           history: mappedDeposits,
         }}
         onShowHistory={() => setShowHistory(true)}

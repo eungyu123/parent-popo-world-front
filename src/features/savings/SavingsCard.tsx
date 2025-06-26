@@ -1,12 +1,15 @@
 import React from "react";
 import DonutChart from "./DonutChart";
 
+type Status = "ACTIVE" | "COMPLETED" | "EXPIRED";
+
 interface SavingsCardProps {
   savingsInfo: {
     current: number;
     goal: number;
     start: string;
     end: string;
+    status: Status;
     history: Array<{
       date: string;
       name: string;
@@ -17,6 +20,28 @@ interface SavingsCardProps {
   onShowHistory: () => void;
 }
 
+const getStatusStyle = (status: Status) => {
+  switch (status) {
+    case "ACTIVE":
+      return "bg-blue-500 text-white";
+    case "COMPLETED":
+      return "bg-green-500 text-white";
+    case "EXPIRED":
+      return "bg-red-500 text-white";
+  }
+};
+
+const getStatusText = (status: Status) => {
+  switch (status) {
+    case "ACTIVE":
+      return "진행중";
+    case "COMPLETED":
+      return "목표 달성 완료";
+    case "EXPIRED":
+      return "기간 만료";
+  }
+};
+
 const SavingsCard: React.FC<SavingsCardProps> = ({
   savingsInfo,
   onShowHistory,
@@ -25,9 +50,18 @@ const SavingsCard: React.FC<SavingsCardProps> = ({
   const reward = Math.floor(savingsInfo.goal * 0.1);
 
   return (
-    <div className="w-[20rem] rounded-2xl shadow-md border-gray-200 border-2 mt-[-2rem]">
+    <div className="w-[20rem] rounded-2xl shadow-md border-gray-200 border-2 mt-[-2rem] relative">
       <div className="bg-blue-400 h-[3rem] w-[19.8rem] text-[1.2rem] flex items-center justify-center text-white rounded-t-xl">
         저축 통장
+      </div>
+      <div className="flex justify-end mt-2 mr-2 absolute top-14 right-2">
+        <div
+          className={`px-3 py-1 rounded-full text-sm ${getStatusStyle(
+            savingsInfo.status
+          )}`}
+        >
+          {getStatusText(savingsInfo.status)}
+        </div>
       </div>
       <div className="bg-white p-4 pb-1 ml-2">
         <div>현재 저축 금액</div>
