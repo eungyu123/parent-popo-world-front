@@ -39,17 +39,14 @@ export default function StayTimeGraph({ StayTimeData }: { StayTimeData: StayTime
 
   useEffect(() => {
     const handleScroll = () => {
-      console.log(scrollContainerRef.current);
       if (scrollContainerRef.current) {
         const scrollLeft = scrollContainerRef.current.scrollLeft;
-        console.log("scrollLeft", scrollLeft);
         setLegendOffset(scrollLeft);
       }
     };
 
     const container = scrollContainerRef.current;
     if (container) {
-      console.log("container", container);
       container.addEventListener("scroll", handleScroll);
       return () => container.removeEventListener("scroll", handleScroll);
     }
@@ -74,7 +71,6 @@ export default function StayTimeGraph({ StayTimeData }: { StayTimeData: StayTime
                 if (length <= 100) return [1, Math.ceil(length / 3), Math.ceil((length * 2) / 3), length]; // 100개 이하면 4개
                 return [1, Math.ceil(length / 4), Math.ceil(length / 2), Math.ceil((length * 3) / 4), length]; // 100개 초과면 5개
               })()}
-              tick={{ fontSize: 10 }}
             />
             <YAxis label={{ value: "단위 (초)", position: "top", angle: 0, offset: 15, dx: 20 }} />
             <Tooltip formatter={(value: number) => `${value.toFixed(2)}초`} />

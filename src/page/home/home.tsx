@@ -22,7 +22,7 @@ export const HomePage: React.FC = () => {
   const authStorage = localStorage.getItem("auth-storage");
   const authData = authStorage ? JSON.parse(authStorage) : null;
   const parentCode = authData?.state?.user?.parentCode;
-  const { logout, child, selectedChildId, setSelectedChildId } = useAuthStore();
+  const { child, selectedChildId, setSelectedChildId } = useAuthStore();
 
   return (
     <>

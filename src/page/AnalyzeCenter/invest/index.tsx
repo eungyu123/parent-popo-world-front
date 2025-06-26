@@ -17,6 +17,9 @@ import type {
   TradingRatioGraph3Props,
   TradingRatioGraph1Props,
 } from "../../../features/analyze/invest/types";
+import x_popo from "../../../assets/image/common/x_popo.png";
+import wait_popo from "../../../assets/image/common/wait_popo.png";
+
 // avg_stay_time
 // buy_ratio
 // sell_ratio
@@ -57,7 +60,11 @@ export const InvestAnalyzePage: React.FC = () => {
   const [selectedAnalyzePeriod, setSelectedAnalyzePeriod] = useState<"all" | "week">("all");
   const { selectedChildId } = useAuthStore();
 
-  const { data: investAnalyzeData, isSuccess } = useQuery<
+  const {
+    data: investAnalyzeData,
+    isSuccess,
+    isLoading,
+  } = useQuery<
     | StayTimeGraphProps[]
     | TradingRatioGraph1Props[]
     | TradingRatioGraph2Props[]
@@ -65,7 +72,7 @@ export const InvestAnalyzePage: React.FC = () => {
     | BettingSuccessGraphProps[]
     | BalanceTrendGraphProps[]
   >({
-    queryKey: ["investAnalyze", selectedAnalyzeType, selectedAnalyzePeriod],
+    queryKey: ["investAnalyze", selectedAnalyzeType, selectedAnalyzePeriod, selectedChildId],
     queryFn: () =>
       getInvestAnalyze({
         graph: selectedAnalyzeType,
@@ -73,15 +80,32 @@ export const InvestAnalyzePage: React.FC = () => {
         selectedChildId: selectedChildId || "",
       }),
     enabled: !!selectedAnalyzeType && !!selectedAnalyzePeriod && !!selectedChildId,
+    staleTime: 1000 * 60 * 60, // 그래프는 데이터 받는데 오래걸리기도하고 게임 데이터 분석이 실시간반영이 안되서 길게둠
   });
 
-  console.log("isSuccess", isSuccess);
+  if (isLoading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-full">
+        <img src={wait_popo} alt="wait_popo" className="w-40 mt-10 mb-6 ml-5" />
+        <div className="text-base font-bold ">데이터를 분석중입니다 ...</div>
+      </div>
+    );
+  }
 
   if (!isSuccess) {
     return;
   }
 
   const AnalyzeGraph = () => {
+    if (investAnalyzeData.length === 0) {
+      return (
+        <div className="flex flex-col justify-center items-center h-full">
+          <img src={x_popo} alt="x_popo" className="w-32 mt-10 mb-6" />
+          <div className="text-base font-bold">데이터가 존재하지 않습니다.</div>
+        </div>
+      );
+    }
+
     if (selectedAnalyzeType === "avg_stay_time") {
       // 체류시간
       return <StayTimeGraph StayTimeData={investAnalyzeData as StayTimeGraphProps[]} />;
@@ -96,10 +120,10 @@ export const InvestAnalyzePage: React.FC = () => {
       return <TradingRatioGraph3 TradingRatioData={investAnalyzeData as TradingRatioGraph3Props[]} />;
     } else if (selectedAnalyzeType === "bet_ratio") {
       // 배팅 성공률
-      return <BettingSuccessGraph />;
+      return <BettingSuccessGraph BettingSuccessData={investAnalyzeData as BettingSuccessGraphProps[]} />;
     } else if (selectedAnalyzeType === "avg_cash_ratio") {
       // 여유자금 추이
-      return <BalanceTrendGraph selectedAnalyzeType={selectedAnalyzeType} />;
+      return <BalanceTrendGraph BalanceTrendData={investAnalyzeData as BalanceTrendGraphProps[]} />;
     }
   };
 
@@ -147,7 +171,7 @@ export const InvestAnalyzePage: React.FC = () => {
       {AnalyzeGraph()}
 
       {/* 아래 선 부모 패딩 좌 2rem, 우 2rem 계산후 반영 */}
-      <div className="my-6 -ml-8 w-[calc(100%_+_4rem)] h-[0.0625rem] bg-gray-200 " />
+      {investAnalyzeData.length > 0 && <div className="my-6 -ml-8 w-[calc(100%_+_4rem)] h-[0.0625rem] bg-gray-200 " />}
 
       {/* 분석 결과 */}
     </>

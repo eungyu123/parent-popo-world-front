@@ -1,5 +1,6 @@
 // 배팅 성공률 그래프
 import { LineChart, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line } from "recharts";
+import { type BettingSuccessGraphProps } from "./types";
 
 // 더미 데이터
 const BettingSuccessDummyData = [
@@ -15,7 +16,12 @@ const BettingSuccessDummyData = [
   { gameId: "10", buySuccess: 80, sellSuccess: 60 },
 ];
 
-export default function BettingSuccessGraph() {
+export default function BettingSuccessGraph({
+  BettingSuccessData,
+}: {
+  BettingSuccessData: BettingSuccessGraphProps[];
+}) {
+  console.log("BettingSuccessData", BettingSuccessData);
   return (
     <div className="w-[calc(100%_+_1rem)] h-80 -ml-4 text-xs">
       <ResponsiveContainer width="100%" height="100%">
