@@ -133,7 +133,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
     const Refresh_key = Cookies.get("refreshToken");
 
     try {
-      const eventSource = new EventSourcePolyfill(`http://52.78.53.247:8080/api/chatbot/sse`, {
+      const eventSource = new EventSourcePolyfill(`${import.meta.env.VITE_API_BASE_URL}/api/chatbot/sse`, {
         headers: {
           "Content-Type": "text/event-stream",
           Authorization: `Bearer ${token}`,
