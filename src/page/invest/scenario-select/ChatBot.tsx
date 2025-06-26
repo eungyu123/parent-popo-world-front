@@ -65,7 +65,7 @@ export interface Stock {
 }
 
 // 각 턴의 전체 상태를 나타내는 타입
-export interface StroyState {
+export interface StoryState {
   turn_number: number; // 턴 번호
   result: string; // 이 턴의 결과 요약
   news: string; // 뉴스 내용
@@ -121,9 +121,10 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isConnected, setIsConnected] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
 
-  let eventSource: EventSourcePolyfill | null = null;
+  const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
+
   useEffect(() => {
     if (scenarioId) {
       editScenario(scenarioId);
@@ -134,7 +135,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
     const Refresh_key = Cookies.get("refreshToken");
 
     try {
-      eventSource = new EventSourcePolyfill(`http://52.78.53.247:8080/api/chatbot/sse`, {
+      const eventSource = new EventSourcePolyfill(`http://52.78.53.247:8080/api/chatbot/sse`, {
         headers: {
           "Content-Type": "text/event-stream",
           Authorization: `Bearer ${token}`,
@@ -143,21 +144,29 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
         withCredentials: true,
       });
 
+      eventSourceRef.current = eventSource;
+
+      eventSource.addEventListener("connect", (event: any) => {
+        console.log("초기 연결 수신:", event.data); // "connected"
+      });
+
+      eventSource.addEventListener("ping", (event: any) => {
+        console.log("ping", event);
+      });
+
       // 메시지 이벤트 리스너
       eventSource.addEventListener("chatbot", (event: any) => {
         try {
           const data = JSON.parse(event.data);
-          // const chapterId = data.chapterId;
-          // const isCustom = data.isCustom;
           console.log(data);
-          const story: StroyState[] = JSON.parse(data.story);
+          const story: StoryState[] = JSON.parse(data.story);
           const turns: TurnState[] = story.map((turn) => ({
             title: turn.turn_number.toString(),
             result: turn.result,
             news: turn.news,
           }));
           setTurnData(turns);
-          setMessages((prev) => [...prev, { message: "asd", isTeacher: true }]);
+          setMessages((prev) => [...prev, { message: data.reply, isTeacher: true }]);
           setIsLoading(false);
         } catch (error) {
           console.error("메시지 파싱 에러:", error);
@@ -173,10 +182,6 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
         setIsConnected(false);
       });
 
-      eventSource.addEventListener("connect", (event: any) => {
-        console.log("초기 연결 수신:", event.data); // "connected"
-      });
-
       // 연결 성공 이벤트 리스너
       eventSource.addEventListener("open", () => {
         console.log("SSE 연결 성공 - URL:", eventSource?.url);
@@ -186,14 +191,16 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
       console.error("챗봇 초기화 중 에러 발생:", error);
       setIsConnected(false);
     }
+
     // cleanup 함수
     return () => {
-      if (eventSource) {
+      if (eventSourceRef.current) {
         console.log("Cleaning up SSE connection");
-        eventSource.close();
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
       }
     };
-  }, [isConnected, scenarioId]);
+  }, [scenarioId]); // isConnected 제거하여 무한 루프 방지
 
   const handleSendMessage = () => {
     if (!inputRef.current?.textContent?.trim() || isLoading) return;
@@ -220,7 +227,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
 
   const handleSaveScenario = async () => {
     if (selectedChildId) {
-      const result = await saveScenario(selectedChildId);
+      const result = await saveScenario(selectedChildId, scenarioName);
       if (result) {
         console.log("saveScenario", result);
         closeModal();

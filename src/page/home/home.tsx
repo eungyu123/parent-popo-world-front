@@ -88,15 +88,6 @@ export const HomePage: React.FC = () => {
             {/* 설명  */}
             <div className="text-xl font-bold text-black mb-2">자녀와 함께 활동해보세요!</div>
             {/* 상단 타이틀 */}
-            <div className="relative flex items-center px-5 bg-white/75 rounded-lg mb-2 h-24">
-              <div className="flex items-center gap-x-2">
-                <img src={investIcon} alt="" className="w-12.5" />
-                <div>
-                  <div className="text-base font-bold text-black">총 투자 분석 레포트!</div>
-                  <div className="text-sm text-main-gray-500">자녀의 모든 활동에 대한 분석을 받아보세요</div>
-                </div>
-              </div>
-            </div>
             <div className="relative bg-white/75 rounded-lg mb-2 h-24 px-5 py-4">
               <div>
                 <div className="text-base font-bold text-black">총 투자 분석 레포트!</div>

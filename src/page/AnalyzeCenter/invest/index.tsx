@@ -9,8 +9,14 @@ import BalanceTrendGraph from "../../../features/analyze/invest/BalanceTrendGrap
 import { useQuery } from "@tanstack/react-query";
 import { getInvestAnalyze } from "../../../api/analyze/invest";
 import { useAuthStore } from "../../../zustand/auth";
-import { ChildNavBar } from "../../../components/nav-bar/ChildNavBar";
-
+import type {
+  BalanceTrendGraphProps,
+  TradingRatioGraph2Props,
+  BettingSuccessGraphProps,
+  StayTimeGraphProps,
+  TradingRatioGraph3Props,
+  TradingRatioGraph1Props,
+} from "../../../features/analyze/invest/types";
 // avg_stay_time
 // buy_ratio
 // sell_ratio
@@ -21,7 +27,7 @@ import { ChildNavBar } from "../../../components/nav-bar/ChildNavBar";
 
 export const investTypes: Record<string, { title: string; color: string }> = {
   avg_stay_time: {
-    title: "평균 턴 체류시간",
+    title: "체류시간",
     color: "#1DB3FB",
   },
   buy_ratio: {
@@ -47,34 +53,47 @@ export const investTypes: Record<string, { title: string; color: string }> = {
 };
 
 export const InvestAnalyzePage: React.FC = () => {
-  const [selectedAnalyzeType, setSelectedAnalyzeType] = useState<string>("buy_ratio");
+  const [selectedAnalyzeType, setSelectedAnalyzeType] = useState<string>("avg_stay_time");
   const [selectedAnalyzePeriod, setSelectedAnalyzePeriod] = useState<"all" | "week">("all");
   const { selectedChildId } = useAuthStore();
 
-  // const { data: investAnalyzeData } = useQuery({
-  //   queryKey: ["investAnalyze", selectedAnalyzeType, selectedAnalyzePeriod],
-  //   queryFn: () =>
-  //     getInvestAnalyze({
-  //       graph: selectedAnalyzeType,
-  //       range: selectedAnalyzePeriod,
-  //       selectedChildId: selectedChildId || "",
-  //     }),
-  //   enabled: !!selectedAnalyzeType && !!selectedAnalyzePeriod && !!selectedChildId,
-  // });
+  const { data: investAnalyzeData, isSuccess } = useQuery<
+    | StayTimeGraphProps[]
+    | TradingRatioGraph1Props[]
+    | TradingRatioGraph2Props[]
+    | TradingRatioGraph3Props[]
+    | BettingSuccessGraphProps[]
+    | BalanceTrendGraphProps[]
+  >({
+    queryKey: ["investAnalyze", selectedAnalyzeType, selectedAnalyzePeriod],
+    queryFn: () =>
+      getInvestAnalyze({
+        graph: selectedAnalyzeType,
+        range: selectedAnalyzePeriod,
+        selectedChildId: selectedChildId || "",
+      }),
+    enabled: !!selectedAnalyzeType && !!selectedAnalyzePeriod && !!selectedChildId,
+  });
+
+  console.log("isSuccess", isSuccess);
+
+  if (!isSuccess) {
+    return;
+  }
 
   const AnalyzeGraph = () => {
     if (selectedAnalyzeType === "avg_stay_time") {
       // 체류시간
-      return <StayTimeGraph />;
+      return <StayTimeGraph StayTimeData={investAnalyzeData as StayTimeGraphProps[]} />;
     } else if (selectedAnalyzeType === "buy_ratio") {
       // 구매 판매 비율
-      return <TradingRatioGraph1 />;
+      return <TradingRatioGraph1 TradingRatioData={investAnalyzeData as TradingRatioGraph1Props[]} />;
     } else if (selectedAnalyzeType === "sell_ratio") {
       // 구매 판매 비율
-      return <TradingRatioGraph2 />;
+      return <TradingRatioGraph2 TradingRatioData={investAnalyzeData as TradingRatioGraph2Props[]} />;
     } else if (selectedAnalyzeType === "buy_sell_ratio") {
       // 구매 판매 비율
-      return <TradingRatioGraph3 />;
+      return <TradingRatioGraph3 TradingRatioData={investAnalyzeData as TradingRatioGraph3Props[]} />;
     } else if (selectedAnalyzeType === "bet_ratio") {
       // 배팅 성공률
       return <BettingSuccessGraph />;
@@ -131,8 +150,6 @@ export const InvestAnalyzePage: React.FC = () => {
       <div className="my-6 -ml-8 w-[calc(100%_+_4rem)] h-[0.0625rem] bg-gray-200 " />
 
       {/* 분석 결과 */}
-      <div className="text-sm font-bold mb-2">분석 결과</div>
-      <div className="text-xs">분석결과 현재 자녀는 매우 공격적입니다. 분석결과 현재 자녀는 매우 공격적입니다.</div>
     </>
   );
 };

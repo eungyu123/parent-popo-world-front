@@ -4,6 +4,7 @@ import { DropdownMenu } from "./DropdownMenu";
 export const ScenarioCard = ({
   name,
   scenarioId,
+  summary,
   updatedAt,
   buttonColor,
   handleDropdownToggle,
@@ -15,6 +16,7 @@ export const ScenarioCard = ({
   name: string;
   scenarioId: string;
   buttonColor: string;
+  summary: string;
   updatedAt: string;
   handleDropdownToggle: (scenarioId: string) => void;
   handleEdit: (scenarioName: string, scenarioId: string) => void;
@@ -45,7 +47,7 @@ export const ScenarioCard = ({
         </div>
       </div>
       {/* 시나리오 리스트 내용 */}
-      {/* <div className="text-sm text-gray-600 mb-4">새로운 시나리오를 확인해보세요</div> */}
+      <div className="text-sm text-gray-600 mb-4">{summary}</div>
       {/* 시나리오 태그, 수정, 생성 날짜 */}
       <div className="flex mt-4">
         {/* <div className="flex gap-x-1">

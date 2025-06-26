@@ -4,7 +4,9 @@ import { ApiError } from "../api";
 // 시나리오 아이템 타입 정의
 export interface ScenarioItem {
   scenarioId: string;
+  scenarioName: string;
   childId: string;
+  summary: string;
   story: string;
   isCustom: boolean;
   createAt: string;

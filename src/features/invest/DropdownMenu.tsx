@@ -12,7 +12,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpen, onClose, onV
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-8 -right-3 flex flex-col gap-y-[0.275rem] px-2 py-2 bg-white border border-gray-200 rounded-md ">
+    <div className="absolute top-8 -right-3 flex flex-col gap-y-[0.275rem] px-2 py-2 bg-white border border-gray-200 rounded-md z-50">
       <button
         onClick={() => {
           onView();

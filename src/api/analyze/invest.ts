@@ -1,4 +1,12 @@
 import apiClient from "../api";
+import type {
+  StayTimeGraphProps,
+  TradingRatioGraph1Props,
+  TradingRatioGraph2Props,
+  TradingRatioGraph3Props,
+  BettingSuccessGraphProps,
+  BalanceTrendGraphProps,
+} from "../../features/analyze/invest/types";
 
 export const getInvestAnalyze = async ({
   graph,
@@ -10,6 +18,7 @@ export const getInvestAnalyze = async ({
   selectedChildId: string;
 }) => {
   try {
+    console.log(graph, range, selectedChildId);
     const response = await apiClient.post(`/api/invest/${graph}/${range}`, selectedChildId);
     console.log("response.data", response.data);
     return response.data;

@@ -10,7 +10,7 @@ import { getScenarioList, type ScenarioItem } from "../../../api/invest/scenario
 import { useAuthStore } from "../../../zustand/auth";
 import { formatDate } from "../../../utils/DateFormatting";
 import { deleteScenario } from "../../../api/invest/delete-scenario";
-import { InvestChatBot, type StroyState, type TurnState } from "./ChatBot";
+import { InvestChatBot, type StoryState, type TurnState } from "./ChatBot";
 import Pagination from "../../../components/page/Pagination";
 import { Header } from "../../../components/header/header";
 import { ChildNavBar } from "../../../components/nav-bar/ChildNavBar";
@@ -68,6 +68,8 @@ export const InvestScenarioSelectPage: React.FC = () => {
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
   // 시나리오 생성 모달
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
+  // 시나리오 이름
+  const [scenarioName, setScenarioName] = useState("");
   // 시나리오 조회 모달
   const [senarioModalOpen, setSenarioModalOpen] = useState(false);
   // 삭제 모달
@@ -135,7 +137,7 @@ export const InvestScenarioSelectPage: React.FC = () => {
 
   const parseTurns = (story: string | undefined) => {
     if (!story) return null;
-    const storyData: StroyState[] = JSON.parse(story);
+    const storyData: StoryState[] = JSON.parse(story);
     const turns: TurnState[] = storyData.map((turn) => ({
       title: turn.turn_number.toString(),
       result: turn.result,
@@ -148,11 +150,7 @@ export const InvestScenarioSelectPage: React.FC = () => {
     return (
       <InvestChatBot
         scenarioType={selectedTheme}
-        scenarioName={`${
-          scenarioList.findIndex((scenario) => scenario.scenarioId === selectedScenarioId) != -1
-            ? `${scenarioList.findIndex((scenario) => scenario.scenarioId === selectedScenarioId) + 1}번 시나리오`
-            : "새로운 시나리오"
-        }`}
+        scenarioName={scenarioName}
         scenarioId={selectedScenarioId || ""}
         closeModal={() => setChatBotOpen(false)}
         turns={
@@ -174,6 +172,8 @@ export const InvestScenarioSelectPage: React.FC = () => {
               setChatBotOpen(true);
             }}
             setSelectedScenarioId={setSelectedScenarioId}
+            scenarioName={scenarioName}
+            setScenarioName={setScenarioName}
           />
         </Modal>
         <SideModal isOpen={senarioModalOpen} onClose={() => setSenarioModalOpen(false)}>
@@ -219,7 +219,8 @@ export const InvestScenarioSelectPage: React.FC = () => {
               return (
                 <ScenarioCard
                   key={scenario.scenarioId}
-                  name={`${(currentPage - 1) * 5 + index + 1}번 시나리오`}
+                  name={scenario.scenarioName}
+                  summary={scenario.summary}
                   scenarioId={scenario.scenarioId}
                   buttonColor={themes[selectedTheme].color}
                   updatedAt={formatDate(scenario.updatedAt)}
