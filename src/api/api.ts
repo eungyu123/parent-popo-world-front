@@ -6,7 +6,11 @@ import { useAuthStore } from "../zustand/auth";
  * API 에러를 처리하기 위한 커스텀 에러 클래스
  */
 export class ApiError extends Error {
-  constructor(public status: number, public message: string, public data?: string) {
+  constructor(
+    public status: number,
+    public message: string,
+    public data?: string
+  ) {
     super(message);
     this.name = "ApiError";
   }
@@ -58,7 +62,9 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     // 요청 설정 중 에러 발생 시 처리
-    return Promise.reject(new ApiError(0, error.message + "요청 설정 중 오류가 발생했습니다."));
+    return Promise.reject(
+      new ApiError(0, error.message + "요청 설정 중 오류가 발생했습니다.")
+    );
   }
 );
 
@@ -108,7 +114,10 @@ apiClient.interceptors.response.use(
           }
         );
 
-        const accessToken = response.headers["authorization"]?.replace("Bearer ", "");
+        const accessToken = response.headers["authorization"]?.replace(
+          "Bearer ",
+          ""
+        );
         if (accessToken) {
           useAuthStore.getState().setAccessToken(accessToken);
         }
@@ -124,7 +133,9 @@ apiClient.interceptors.response.use(
         Cookies.remove("refreshToken");
         useAuthStore.getState().logout();
 
-        return Promise.reject(new ApiError(401, "세션이 만료되었습니다. 다시 로그인해주세요."));
+        return Promise.reject(
+          new ApiError(401, "세션이 만료되었습니다. 다시 로그인해주세요.")
+        );
       }
     }
 
@@ -137,13 +148,19 @@ apiClient.interceptors.response.use(
         return Promise.reject(new ApiError(status, "접근 권한이 없습니다."));
       case 404:
         // 리소스를 찾을 수 없음
-        return Promise.reject(new ApiError(status, "요청한 리소스를 찾을 수 없습니다."));
+        return Promise.reject(
+          new ApiError(status, "요청한 리소스를 찾을 수 없습니다.")
+        );
       case 500:
         // 서버 에러
-        return Promise.reject(new ApiError(status, "서버 에러가 발생했습니다."));
+        return Promise.reject(
+          new ApiError(status, "서버 에러가 발생했습니다.")
+        );
       default:
         // 기타 에러
-        return Promise.reject(new ApiError(status, "알 수 없는 에러가 발생했습니다."));
+        return Promise.reject(
+          new ApiError(status, "알 수 없는 에러가 발생했습니다.")
+        );
     }
   }
 );

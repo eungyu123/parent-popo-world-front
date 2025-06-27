@@ -21,6 +21,7 @@ import { ProductAnalyzePage } from "./page/AnalyzeCenter/store/ProductAnalyzePag
 import { AnalyzeCenterPage } from "./page/AnalyzeCenter";
 import { AnalyzeCenterLayout } from "./page/AnalyzeCenter/layout";
 import { MyPage } from "./page/mypage";
+import { AnalyzeQuestPage } from "./page/AnalyzeCenter/quest";
 
 // QueryClient 인스턴스 생성
 const queryClient = new QueryClient({
@@ -64,6 +65,7 @@ function App() {
               <Route index element={<AnalyzeCenterPage />} />
               <Route path="invest" element={<InvestAnalyzePage />} />
               <Route path="store" element={<ProductAnalyzePage />} />
+              <Route path="quest" element={<AnalyzeQuestPage/>}/>
             </Route>
 
             {/* 저축 리포트 */}
