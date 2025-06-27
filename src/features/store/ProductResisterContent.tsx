@@ -101,7 +101,7 @@ export const ProductResisterContent = ({
                 : selectedAddProduct?.imageUrl || ""
             }
             alt=""
-            className="w-1/2 h-1/2 object-contain"
+            className={"w-5/6 h-5/6 object-contain"}
           />
         </div>
         <div className="flex flex-col gap-y-0.5 ">

@@ -32,6 +32,7 @@ export const ProductManagementPage: React.FC = () => {
 
   const [items, setItems] = useState<ProductItem[]>([]);
   const { selectedChildId } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   // 상품 조회
   const { data: storeItems, isSuccess } = useQuery({
@@ -82,6 +83,8 @@ export const ProductManagementPage: React.FC = () => {
   };
 
   const handleAddProduct = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     if (!selectedChildId || !selectedAddProduct) {
       alert("자녀를 선택해주세요");
       return;
@@ -103,30 +106,36 @@ export const ProductManagementPage: React.FC = () => {
       return;
     }
 
-    if (!selectedAddProduct.imageUrl) {
+    if (!selectedAddProduct.imageUrl && !selectedAddProduct.image) {
       alert("상품 이미지를 선택해주세요.");
       return;
     }
 
+    let uploadedImageUrl;
     if (selectedAddProduct.image) {
       const uploaded = await uploadImageToCloudinary(selectedAddProduct.image);
       if (!uploaded) {
         alert("이미지 업로드 실패");
         return;
       }
-      selectedAddProduct.imageUrl = uploaded;
+      uploadedImageUrl = uploaded;
     }
 
-    console.log("selectedAddProduct", selectedAddProduct);
+    const product = {
+      ...selectedAddProduct,
+      imageUrl: uploadedImageUrl ? uploadedImageUrl : selectedAddProduct.imageUrl,
+    };
 
-    createProductMutation.mutate(selectedAddProduct);
+    createProductMutation.mutate(product);
+
     setIsAddProductBottomSheetOpen(false);
     setSelectedAddProduct({
       productName: "",
       price: 0,
-      imageUrl: IMAGE_URLS.items.donut,
+      imageUrl: uploadedImageUrl ? uploadedImageUrl : IMAGE_URLS.items.donut,
       label: "",
     });
+    setIsLoading(false);
   };
 
   const handleCreateProductModalOpen = () => {
@@ -167,7 +176,7 @@ export const ProductManagementPage: React.FC = () => {
         {items.map((item) => (
           <div key={item.productId} className="flex flex-col gap-y-2" onClick={() => handleProductClick(item)}>
             <div className="relative flex w-full aspect-square bg-main-white-500 justify-center items-center border-2 border-gray-100 text-lg shadow-custom-2 rounded-xl active:scale-95 transition-all duration-100">
-              <img src={item.imageUrl || ""} alt={item.productName} className="w-1/2 h-1/2 object-contain" />
+              <img src={item.imageUrl || ""} alt={item.productName} className="w-5/6 aspect-square object-contain" />
               {/* 라벨 */}
               {item.label && (
                 <div className="absolute top-1 right-1 bg-main-green-400 text-main-white-500 text-xs rounded-full px-1 py-0.5">

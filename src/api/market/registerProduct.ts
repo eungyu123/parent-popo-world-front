@@ -37,6 +37,7 @@ export const createStoreProduct = async ({
       productImage,
       label: REVERSE_LABEL_LIST[label],
     });
+    console.log("response", response);
     if (response.status === 200) {
       return response.data;
     }

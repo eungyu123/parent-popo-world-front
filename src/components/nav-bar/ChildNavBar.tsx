@@ -15,7 +15,7 @@ export const ChildNavBar: React.FC<ChildNavBarProps> = ({ selectedColor = "#0000
         child.map((_child) => (
           <button
             key={_child.userId}
-            className={`flex-1 py-1 px-2 rounded-xl text-sm font-semibold transition ${
+            className={`flex-1 py-1 px-2 rounded-xl text-sm font-semibold transition whitespace-nowrap ${
               selectedChildId === _child.userId ? "bg-white shadow " : ""
             }`}
             style={{
