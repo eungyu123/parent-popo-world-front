@@ -4,6 +4,7 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import apiClient from "../../../api/api";
 import { useAuthStore } from "../../../zustand/auth";
 import Cookies from "js-cookie";
@@ -15,6 +16,7 @@ interface SignInForm {
 
 export function SignInPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { setUser, setAccessToken, setChildren, selectedChildId, setSelectedChildId } = useAuthStore();
   const [formData, setFormData] = useState<SignInForm>({
     email: "",
@@ -63,6 +65,9 @@ export function SignInPage() {
           setSelectedChildId(response.data.children[0].userId);
         }
       }
+
+      // 모든 캐시 무효화 (다른 사용자의 데이터가 남아있을 수 있으므로)
+      queryClient.clear();
 
       // 메인 페이지로 이동
       navigate("/");
