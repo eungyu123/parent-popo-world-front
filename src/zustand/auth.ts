@@ -72,16 +72,9 @@ export const useAuthStore = create<AuthStore>()(
       setAccessToken: (token: string) => set({ accessToken: token }),
       // Child 설정 액션
       setChildren: (child: Child[]) => {
-        set((state) => ({
-          child,
-          // 자녀 목록이 변경될 때 선택된 자녀가 없으면 첫 번째 자녀를 선택
-          selectedChildId:
-            state.selectedChildId ||
-            (child.length > 0 ? child[0].userId : null),
-        }));
+        set({ child });
       },
-      setSelectedChildId: (childId: string) =>
-        set({ selectedChildId: childId }),
+      setSelectedChildId: (childId: string) => set({ selectedChildId: childId }),
     }),
     {
       name: "auth-storage", // localStorage에 저장될 키 이름

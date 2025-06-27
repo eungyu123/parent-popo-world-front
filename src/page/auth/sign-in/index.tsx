@@ -15,7 +15,7 @@ interface SignInForm {
 
 export function SignInPage() {
   const navigate = useNavigate();
-  const { setUser, setAccessToken, setChildren } = useAuthStore();
+  const { setUser, setAccessToken, setChildren, selectedChildId, setSelectedChildId } = useAuthStore();
   const [formData, setFormData] = useState<SignInForm>({
     email: "",
     password: "",
@@ -38,15 +38,10 @@ export function SignInPage() {
     try {
       setIsSubmitting(true);
       const response = await apiClient.post("/auth/login", formData);
-      console.log("응답 헤더:", response.data);
 
       // 액세스 토큰 저장
-      const accessToken = response.headers["authorization"]?.replace(
-        "Bearer ",
-        ""
-      );
+      const accessToken = response.headers["authorization"]?.replace("Bearer ", "");
       setAccessToken(accessToken);
-      setChildren(response.data.children);
       // 리프레시 토큰 저장
       const refreshToken = response.headers["refresh-token"];
       if (refreshToken) {
@@ -59,12 +54,14 @@ export function SignInPage() {
 
       // 사용자 정보 저장
       if (response.data) {
-        console.log(response.data);
+        setChildren(response.data.children);
         setUser({
           name: response.data.name,
           parentCode: response.data.parentCode,
         });
-        console.log("로그인 성공");
+        if (!selectedChildId) {
+          setSelectedChildId(response.data.children[0].userId);
+        }
       }
 
       // 메인 페이지로 이동
@@ -79,9 +76,7 @@ export function SignInPage() {
 
   return (
     <div className="flex flex-col justify-center px-6 py-10 bg-white rounded-3xl mt-31 scrollbar-hidden">
-      <h3 className="mb-6 text-2xl font-bold text-[#5E2B00] text-center">
-        POPO WORLD
-      </h3>
+      <h3 className="mb-6 text-2xl font-bold text-[#5E2B00] text-center">POPO WORLD</h3>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-1">
           <label className="text-[#5E2B00] font-bold">이메일</label>

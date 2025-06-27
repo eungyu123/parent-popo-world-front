@@ -22,6 +22,9 @@ import { AnalyzeCenterPage } from "./page/AnalyzeCenter";
 import { AnalyzeCenterLayout } from "./page/AnalyzeCenter/layout";
 import { MyPage } from "./page/mypage";
 import { AnalyzeQuestPage } from "./page/AnalyzeCenter/quest";
+import { getUser } from "./api/user/getUser";
+import { useEffect } from "react";
+import { useAuthStore } from "./zustand/auth";
 
 // QueryClient 인스턴스 생성
 const queryClient = new QueryClient({
@@ -34,6 +37,24 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const { setUser, setChildren, selectedChildId, setSelectedChildId } = useAuthStore();
+
+  useEffect(() => {
+    getUser().then((data) => {
+      if (data) {
+        console.log("res.data", data.children);
+        setChildren(data.children);
+        setUser({
+          name: data.name,
+          parentCode: data.parentCode,
+        });
+        if (!selectedChildId) {
+          setSelectedChildId(data.children[0].userId);
+        }
+      }
+    });
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
