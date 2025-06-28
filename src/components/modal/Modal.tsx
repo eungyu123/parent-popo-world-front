@@ -6,10 +6,9 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  className?: string;
 }
 
-export const Modal = ({ isOpen, onClose, children, className }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
   const { openModal, closeModal } = useModalStore();
 
   useEffect(() => {
