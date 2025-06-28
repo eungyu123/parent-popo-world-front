@@ -6,8 +6,12 @@ import { ScenarioCreateModal } from "../../../features/invest/scenarioCreateModa
 import { TurnSideModal } from "../../../features/invest/TurnSideModal";
 import { ScenarioCard } from "../../../features/invest/ScenarioCard";
 import ThemeSelector from "../../../features/invest/ThemeSelector";
-import { getScenarioList, type ScenarioItem } from "../../../api/invest/scenario-list";
+import {
+  getScenarioList,
+  type ScenarioItem,
+} from "../../../api/invest/scenario-list";
 import { useAuthStore } from "../../../zustand/auth";
+import { useModalStore } from "../../../zustand/modal";
 import { formatDate } from "../../../utils/DateFormatting";
 import { deleteScenario } from "../../../api/invest/delete-scenario";
 import { InvestChatBot, type StoryState, type TurnState } from "./ChatBot";
@@ -61,12 +65,17 @@ const queryClient = new QueryClient();
 
 export const InvestScenarioSelectPage: React.FC = () => {
   const navigate = useNavigate();
+  const { openModal, closeModal } = useModalStore();
   // 선택된 자녀
   const { selectedChildId } = useAuthStore();
   // 선택된 테마
-  const [selectedTheme, setSelectedTheme] = useState(themes["아기돼지 삼형제"].name);
+  const [selectedTheme, setSelectedTheme] = useState(
+    themes["아기돼지 삼형제"].name
+  );
   // 선택된 시나리오 ID
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(
+    null
+  );
   // 시나리오 생성 모달
   const [senarioCreateModalOpen, setSenarioCreateModalOpen] = useState(false);
   // 시나리오 이름
@@ -87,7 +96,13 @@ export const InvestScenarioSelectPage: React.FC = () => {
 
   const { data: scenarioData } = useQuery({
     queryKey: ["scenarioList", selectedChildId, selectedTheme, currentPage],
-    queryFn: () => getScenarioList(currentPage - 1, 5, selectedChildId || "", themes[selectedTheme].chapterId),
+    queryFn: () =>
+      getScenarioList(
+        currentPage - 1,
+        5,
+        selectedChildId || "",
+        themes[selectedTheme].chapterId
+      ),
   });
 
   // scenarioData가 변경될 때만 상태 업데이트
@@ -95,10 +110,13 @@ export const InvestScenarioSelectPage: React.FC = () => {
     if (scenarioData) {
       setTotalPages(Number(scenarioData.totalPageSize || 0));
       setOpenDropdowns(
-        scenarioData.scenarioList.reduce((acc: { [key: string]: boolean }, scenario: ScenarioItem) => {
-          acc[scenario.scenarioId] = false;
-          return acc;
-        }, {} as { [key: string]: boolean })
+        scenarioData.scenarioList.reduce(
+          (acc: { [key: string]: boolean }, scenario: ScenarioItem) => {
+            acc[scenario.scenarioId] = false;
+            return acc;
+          },
+          {} as { [key: string]: boolean }
+        )
       );
     }
   }, [scenarioData]);
@@ -153,17 +171,32 @@ export const InvestScenarioSelectPage: React.FC = () => {
   console.log("selectedTheme", selectedTheme);
   console.log(Object.values(themes));
 
+  useEffect(() => {
+    // 챗봇이나 시나리오 생성 모달이 열려있을 때 네비바 숨기기
+    if (chatBotOpen || senarioCreateModalOpen) {
+      openModal();
+    } else {
+      closeModal();
+    }
+  }, [chatBotOpen, senarioCreateModalOpen, openModal, closeModal]);
+
   if (chatBotOpen) {
     return (
       <InvestChatBot
         scenarioType={selectedTheme}
         scenarioName={scenarioName}
         scenarioId={selectedScenarioId || ""}
-        closeModal={() => setChatBotOpen(false)}
+        closeModal={() => {
+          setChatBotOpen(false);
+        }}
         turns={
-          scenarioData?.scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story
+          scenarioData?.scenarioList.find(
+            (scenario) => scenario.scenarioId === selectedScenarioId
+          )?.story
             ? parseTurns(
-                scenarioData?.scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story
+                scenarioData?.scenarioList.find(
+                  (scenario) => scenario.scenarioId === selectedScenarioId
+                )?.story
               )
             : null
         }
@@ -172,9 +205,18 @@ export const InvestScenarioSelectPage: React.FC = () => {
   } else
     return (
       <>
-        <Modal isOpen={senarioCreateModalOpen} onClose={() => setSenarioCreateModalOpen(false)}>
+        <Modal
+          isOpen={senarioCreateModalOpen}
+          onClose={() => {
+            setSenarioCreateModalOpen(false);
+          }}
+        >
           <ScenarioCreateModal
-            scenarioId={DEFAULT_SCENARIO_ID[selectedTheme as keyof typeof DEFAULT_SCENARIO_ID] || ""}
+            scenarioId={
+              DEFAULT_SCENARIO_ID[
+                selectedTheme as keyof typeof DEFAULT_SCENARIO_ID
+              ] || ""
+            }
             selectedTheme={selectedTheme}
             setSenarioCreateModalOpen={setSenarioCreateModalOpen}
             chatbotOpen={() => {
@@ -185,11 +227,16 @@ export const InvestScenarioSelectPage: React.FC = () => {
             setScenarioName={setScenarioName}
           />
         </Modal>
-        <SideModal isOpen={senarioModalOpen} onClose={() => setSenarioModalOpen(false)}>
+        <SideModal
+          isOpen={senarioModalOpen}
+          onClose={() => setSenarioModalOpen(false)}
+        >
           <TurnSideModal
             turns={
               parseTurns(
-                scenarioData?.scenarioList.find((scenario) => scenario.scenarioId === selectedScenarioId)?.story
+                scenarioData?.scenarioList.find(
+                  (scenario) => scenario.scenarioId === selectedScenarioId
+                )?.story
               ) || []
             }
             scenarioColor={themes[selectedTheme].color}
@@ -198,7 +245,11 @@ export const InvestScenarioSelectPage: React.FC = () => {
             setSenarioModalOpen={setSenarioModalOpen}
           />
         </SideModal>
-        <Header title={"시나리오 선택"} onClick={() => {}} backButtonOnClick={() => navigate("/")}></Header>
+        <Header
+          title={"시나리오 선택"}
+          onClick={() => {}}
+          backButtonOnClick={() => navigate("/")}
+        ></Header>
         <ChildNavBar selectedColor={"#000000"} />
         <div className="text-sm mb-2">시나리오 종류</div>
         <div className="flex gap-x-3.5 pb-2 mb-6 overflow-x-auto scrollbar-hidden">
@@ -218,7 +269,11 @@ export const InvestScenarioSelectPage: React.FC = () => {
             className="text-xs px-2 py-1 rounded-sm border border-gray-100 shadow-sm active:scale-95 transition-all duration-100"
             onClick={() => {
               setSenarioCreateModalOpen(true);
-              setSelectedScenarioId(DEFAULT_SCENARIO_ID[selectedTheme as keyof typeof DEFAULT_SCENARIO_ID] || "");
+              setSelectedScenarioId(
+                DEFAULT_SCENARIO_ID[
+                  selectedTheme as keyof typeof DEFAULT_SCENARIO_ID
+                ] || ""
+              );
             }}
           >
             시나리오 생성
@@ -246,7 +301,11 @@ export const InvestScenarioSelectPage: React.FC = () => {
               );
             })}
           {/* 페이지네이션 */}
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </>
     );

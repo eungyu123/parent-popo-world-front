@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { ChildCard } from "../../features/home/ChildCard";
 import defaultChildBoyImage from "../../assets/image/common/boy.png";
 import defaultChildGirlImage from "../../assets/image/common/girl.png";
@@ -23,6 +23,31 @@ export const HomePage: React.FC = () => {
   const authData = authStorage ? JSON.parse(authStorage) : null;
   const parentCode = authData?.state?.user?.parentCode;
   const { child, selectedChildId, setSelectedChildId } = useAuthStore();
+
+  // 자녀 카드들의 ref를 저장할 배열
+  const cardContainerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // 컴포넌트가 마운트되거나 selectedChildId가 변경될 때 스크롤
+  useEffect(() => {
+    if (selectedChildId && cardContainerRef.current) {
+      const selectedIndex = child.findIndex(
+        (c) => c.userId === selectedChildId
+      );
+      if (selectedIndex !== -1 && cardRefs.current[selectedIndex]) {
+        cardRefs.current[selectedIndex]?.scrollIntoView({
+          behavior: "smooth",
+          inline: "center",
+          block: "nearest",
+        });
+      }
+    }
+  }, [selectedChildId, child]);
+
+  // refs 배열 초기화
+  useEffect(() => {
+    cardRefs.current = cardRefs.current.slice(0, child.length);
+  }, [child]);
 
   return (
     <>
@@ -86,20 +111,31 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-          {/* 자녀 카드 */}
-          <div className="flex pl-7 pr-7 flex-nowrap overflow-x-auto scrollbar-hidden gap-x-3 mb-4">
-            {child.map((child: Child) => (
-              <ChildCard
-                key={child.userId}
-                image={
-                  child.sex === "M"
-                    ? defaultChildBoyImage
-                    : defaultChildGirlImage
-                }
-                child={child}
-                selected={selectedChildId === child.userId}
-                setSelectedChildId={() => setSelectedChildId(child.userId)}
-              />
+          {/* 자녀 카드 스크롤 컨테이너 */}
+          <div
+            ref={cardContainerRef}
+            className="flex pl-7 pr-7 flex-nowrap overflow-x-auto scrollbar-hidden gap-x-3 mb-4 scroll-smooth"
+          >
+            {child.map((childInfo, index) => (
+              <div
+                key={childInfo.userId}
+                ref={(el) => {
+                  cardRefs.current[index] = el;
+                }}
+              >
+                <ChildCard
+                  image={
+                    childInfo.sex === "M"
+                      ? defaultChildBoyImage
+                      : defaultChildGirlImage
+                  }
+                  child={childInfo}
+                  selected={selectedChildId === childInfo.userId}
+                  setSelectedChildId={() =>
+                    setSelectedChildId(childInfo.userId)
+                  }
+                />
+              </div>
             ))}
           </div>
 
@@ -162,7 +198,7 @@ export const HomePage: React.FC = () => {
             </h2>
             <Link
               to="/analyze"
-              className="flex flex-col  w-full bg-white/75 rounded-3xl shadow py-4 px-3"
+              className="flex flex-col  w-full bg-white/75 rounded-3xl shadow py-4 px-3 mb-13"
             >
               <img src={analyzeCenter} alt="" className="w-full mb-2" />
               <div className="text-2xl font-bold text-black mb-1 ml-2">

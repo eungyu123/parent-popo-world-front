@@ -5,7 +5,7 @@ import SavingsHistoryModal from "../../../features/savings/SavingsHistoryModal";
 import SavingsCard from "../../../features/savings/SavingsCard";
 import NavigationButton from "../../../features/savings/NavigationButton";
 import { useAuthStore } from "../../../zustand/auth";
-
+import xpopo from "../../../assets/image/common/x_popo.png";
 // 날짜 포맷 변환 함수
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -55,7 +55,10 @@ export const SavingsReportPage: React.FC = () => {
 
   if (error || savingsAccounts.length === 0) {
     return (
-      <div className="flex justify-center items-center flex-1 text-red-500">{error || "저축통장이 없습니다."}</div>
+      <>
+      <img src={xpopo} alt="xpopo" className="w-50 h-60 mx-auto ml-20 mt-10 mb-10" />
+      <div className="flex justify-center items-center flex-1 text-lg font-bold">{error || "데이터가 존재하지 않습니다."}</div>
+      </>
     );
   }
 

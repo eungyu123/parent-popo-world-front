@@ -13,6 +13,7 @@ import { editScenario } from "../../../api/invest/edit-scenario";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { sendChatbotMessage } from "../../../api/invest/chatbot-message";
 import { useAuthStore } from "../../../zustand/auth";
+import { useModalStore } from "../../../zustand/modal";
 import Cookies from "js-cookie";
 import theacher_popo from "../../../assets/image/common/teacher_popo.png";
 import { saveScenario } from "../../../api/invest/save-scenario";
@@ -114,6 +115,7 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
   console.log("scenarioId", scenarioId);
 
   const { selectedChildId } = useAuthStore();
+  const { openModal, closeModal: closeNavModal } = useModalStore();
 
   const [turnData, setTurnData] = useState<TurnState[]>(turns || initialTurns);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -136,14 +138,17 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
     const Refresh_key = Cookies.get("refreshToken");
 
     try {
-      const eventSource = new EventSourcePolyfill(`${import.meta.env.VITE_API_BASE_URL}/api/chatbot/sse`, {
-        headers: {
-          "Content-Type": "text/event-stream",
-          Authorization: `Bearer ${token}`,
-          Refresh_key: `Bearer ${Refresh_key}`,
-        },
-        withCredentials: true,
-      });
+      const eventSource = new EventSourcePolyfill(
+        `${import.meta.env.VITE_API_BASE_URL}/api/chatbot/sse`,
+        {
+          headers: {
+            "Content-Type": "text/event-stream",
+            Authorization: `Bearer ${token}`,
+            Refresh_key: `Bearer ${Refresh_key}`,
+          },
+          withCredentials: true,
+        }
+      );
 
       eventSourceRef.current = eventSource;
 
@@ -167,7 +172,10 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
             news: turn.news,
           }));
           setTurnData(turns);
-          setMessages((prev) => [...prev, { message: data.reply, isTeacher: true }]);
+          setMessages((prev) => [
+            ...prev,
+            { message: data.reply, isTeacher: true },
+          ]);
           setIsLoading(false);
         } catch (error) {
           console.error("메시지 파싱 에러:", error);
@@ -200,10 +208,27 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
     };
   }, [scenarioId]); // isConnected 제거하여 무한 루프 방지
 
+  useEffect(() => {
+    // 챗봇이 열릴 때 네비바 숨기기
+    openModal();
+    return () => {
+      // 챗봇이 닫힐 때 네비바 표시
+      closeNavModal();
+    };
+  }, []);
+
+  const handleCloseModal = () => {
+    closeModal();
+    closeNavModal();
+  };
+
   const handleSendMessage = () => {
     if (!inputRef.current?.textContent?.trim() || isLoading) return;
 
-    setMessages((prev) => [...prev, { message: inputRef.current?.textContent || "", isTeacher: false }]);
+    setMessages((prev) => [
+      ...prev,
+      { message: inputRef.current?.textContent || "", isTeacher: false },
+    ]);
     sendChatbotMessage({ message: inputRef.current?.textContent || "" });
     setIsSend(true);
     setIsLoading(true);
@@ -236,16 +261,20 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
   return (
     <>
       {/* 챗봇 나가기 모달 */}
-      <Modal isOpen={senarioCreateModalOpen} onClose={() => setSenarioCreateModalOpen(false)}>
+      <Modal
+        isOpen={senarioCreateModalOpen}
+        onClose={() => setSenarioCreateModalOpen(false)}
+      >
         <ChatOutModal
           setSenarioCreateModalOpen={setSenarioCreateModalOpen}
-          onClick={() => {
-            closeModal();
-          }}
+          onClick={handleCloseModal}
         />
       </Modal>
       {/* 사이드바 */}
-      <SideModal isOpen={senarioModalOpen} onClose={() => setSenarioModalOpen(false)}>
+      <SideModal
+        isOpen={senarioModalOpen}
+        onClose={() => setSenarioModalOpen(false)}
+      >
         <ChatTurnSideModal
           turns={turnData}
           scenarioColor={themes[scenarioType].color}
@@ -286,7 +315,9 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
         ) : (
           <ChatMessage
             key={"첫 메세지"}
-            message={"안녕하세요  포포 교수님입니다. 첫 메시지와 함께 수정된 오른쪽 위 턴 정보를 확인하세요!"}
+            message={
+              "안녕하세요  포포 교수님입니다. 첫 메시지와 함께 수정된 오른쪽 위 턴 정보를 확인하세요!"
+            }
             isTeacher={true}
             parentChatColor={themes[scenarioType].color}
           />
@@ -295,7 +326,11 @@ export const InvestChatBot: React.FC<InvestChatBotProps> = ({
           <div className="flex flex-col gap-y-1">
             <div className="flex">
               <div className="flex justify-center items-center w-8 h-8 rounded-full bg-main-white-500 border border-gray-100 shadow-custom-2">
-                <img src={theacher_popo} alt={"포포 교수님"} className="w-4/5 h-4/5 object-contain" />
+                <img
+                  src={theacher_popo}
+                  alt={"포포 교수님"}
+                  className="w-4/5 h-4/5 object-contain"
+                />
               </div>
               <div className="text-sm py-2.5 px-2">포포 교수님</div>
             </div>

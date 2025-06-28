@@ -1,5 +1,6 @@
 import React from "react";
 import { SavingsHistoryRow } from "./SavingsHistoryRow";
+import { useModalStore } from "../../zustand/modal";
 
 interface SavingsHistoryItem {
   date: string;
@@ -15,6 +16,8 @@ interface Props {
 }
 
 const SavingsHistoryModal: React.FC<Props> = ({ open, onClose, history }) => {
+  const { openModal, closeModal } = useModalStore();
+
   // 모달이 열릴 때 body 스크롤 막기
   React.useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
@@ -28,6 +31,7 @@ const SavingsHistoryModal: React.FC<Props> = ({ open, onClose, history }) => {
         width: 100% !important;
         height: 100% !important;
       `;
+      openModal(); // 네비바 숨기기
     }
 
     // cleanup function - 모달이 닫힐 때 원래 상태로 복구
@@ -37,8 +41,11 @@ const SavingsHistoryModal: React.FC<Props> = ({ open, onClose, history }) => {
       document.body.style.position = "";
       document.body.style.width = "";
       document.body.style.height = "";
+      if (open) {
+        closeModal(); // 네비바 다시 표시
+      }
     };
-  }, [open]);
+  }, [open, openModal, closeModal]);
 
   if (!open) return null;
 

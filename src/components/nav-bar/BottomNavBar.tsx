@@ -1,13 +1,18 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useModalStore } from "../../zustand/modal";
 import homeIcon from "../../assets/image/navbar/homeIcon.png";
 import analyzeIcon from "../../assets/image/navbar/analyzeIcon.png";
 import shopIcon from "../../assets/image/navbar/shopIcon.png";
 import mypageIcon from "../../assets/image/navbar/mypageIcon.png";
+import { scrollToTop } from "../../utils/scrolltoTop";
 
 interface NavItem {
   icon: string;
   path: string;
 }
+
+// 네비바를 숨길 페이지 경로 목록
+const hideNavBarPaths = ["/login", "/signup"];
 
 const navItems: NavItem[] = [
   {
@@ -31,9 +36,24 @@ const navItems: NavItem[] = [
 export const BottomNavBar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isAnyModalOpen = useModalStore((state) => state.isAnyModalOpen);
+
+  // 현재 페이지에서 네비바를 숨길지 확인
+  const shouldHideNavBar = () => {
+    return (
+      hideNavBarPaths.some((path) => location.pathname.startsWith(path)) ||
+      isAnyModalOpen
+    ); // 모달이 열려있을 때도 숨김
+  };
+
+  // 네비바를 숨겨야 하면 null 반환
+  if (shouldHideNavBar()) {
+    return null;
+  }
 
   const handleNavClick = (path: string) => {
     navigate(path);
+    scrollToTop();
   };
 
   const isActive = (path: string) => {

@@ -17,7 +17,12 @@ interface ChildCardProps {
 // userId: string;
 // createdAt: string;
 
-export const ChildCard: React.FC<ChildCardProps> = ({ image, child, selected, setSelectedChildId }) => {
+export const ChildCard: React.FC<ChildCardProps> = ({
+  image,
+  child,
+  selected,
+  setSelectedChildId,
+}) => {
   return (
     <div
       className={clsx(
@@ -44,7 +49,9 @@ export const ChildCard: React.FC<ChildCardProps> = ({ image, child, selected, se
       <div className="font-bold mb-0.5 ml-2">
         이메일: <span className="text-sm">{child.email}</span>
       </div>
-      <div className="font-bold mb-0.5 ml-2">가입일자: {child.createdAt.slice(0, 10).replace(/-/g, ".")}</div>
+      <div className="font-bold mb-0.5 ml-2">
+        가입일자: {child.createdAt.slice(0, 10).replace(/-/g, ".")}
+      </div>
     </div>
   );
 };
