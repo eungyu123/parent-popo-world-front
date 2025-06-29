@@ -22,9 +22,7 @@ import { AnalyzeCenterPage } from "./page/AnalyzeCenter";
 import { AnalyzeCenterLayout } from "./page/AnalyzeCenter/layout";
 import { MyPage } from "./page/mypage";
 import { AnalyzeQuestPage } from "./page/AnalyzeCenter/quest";
-import { getUser } from "./api/user/getUser";
-import { useEffect } from "react";
-import { useAuthStore } from "./zustand/auth";
+import PushNotificationProvider from "./components/layout/PushNotificationProvider";
 
 // QueryClient 인스턴스 생성
 const queryClient = new QueryClient({
@@ -41,11 +39,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          {/* 홈 */}
-          {/* prettier-ignore */}
-          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-          {/* prettier-ignore */}
-          <Route path="/" element={<ProtectedRoute><BaseLayout /></ProtectedRoute>}>
+          <Route path="/" element={<PushNotificationProvider queryClient={queryClient} />}>
+            {/* 홈 */}
+            {/* prettier-ignore */}
+            <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            {/* prettier-ignore */}
+            <Route path="/" element={<ProtectedRoute><BaseLayout /></ProtectedRoute>}>
             {/* 상점 */}
             <Route path="/store" element={<StoreLayout />}>
               <Route path="product-management" element={<ProductManagementPage />} />
@@ -80,10 +79,11 @@ function App() {
             <Route path="/mypage" element={<MyPage />} />
           </Route>
 
-          {/* 로그인, 회원가입 */}
-          <Route path="/auth" element={<AuthLayout />}>
-            <Route path="sign-in" element={<SignInPage />} />
-            <Route path="sign-up" element={<SignUpPage />} />
+            {/* 로그인, 회원가입 */}
+            <Route path="/auth" element={<AuthLayout />}>
+              <Route path="sign-in" element={<SignInPage />} />
+              <Route path="sign-up" element={<SignUpPage />} />
+            </Route>
           </Route>
         </Routes>
       </Router>

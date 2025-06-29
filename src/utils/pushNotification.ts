@@ -1,5 +1,4 @@
 import { getPublicKey } from "../api/push/getPublicKey";
-import { testAlert } from "../api/push/testAlert";
 import { urlBase64ToUint8Array, arrayBufferToBase64 } from "./utils";
 import { postSubscribe } from "../api/push/postSubscribe";
 export const subscribe = async () => {
@@ -57,7 +56,6 @@ export const subscribe = async () => {
       const auth = arrayBufferToBase64(authKey);
       const response = await postSubscribe(subscription.endpoint, p256dh, auth);
       console.log("response, postSubscribe", response);
-      await testAlert();
     } else {
       console.log("p256dh or auth key가 없음");
     }

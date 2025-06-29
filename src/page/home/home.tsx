@@ -17,6 +17,7 @@ import questIcon from "../../assets/image/common/quest.png";
 import { BottomNavBar } from "../../components/nav-bar/BottomNavBar";
 import { getUser } from "../../api/user/getUser";
 import { subscribe } from "../../utils/pushNotification";
+import { useQuery } from "@tanstack/react-query";
 
 export const HomePage: React.FC = () => {
   const [isOpenParentCode, setIsOpenParentCode] = useState(false);
@@ -29,20 +30,23 @@ export const HomePage: React.FC = () => {
     subscribe();
   }, []);
 
+  const { data: userData } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => getUser(),
+  });
+
   useEffect(() => {
-    getUser().then((data) => {
-      if (data) {
-        if (data.children && data.children.length > 0) {
-          setChildren(data.children);
-          setSelectedChildId(data.children[0].userId);
-        }
-        setUser({
-          name: data.name,
-          parentCode: data.parentCode,
-        });
+    if (userData) {
+      if (userData.children && userData.children.length > 0) {
+        setChildren(userData.children);
+        setSelectedChildId(userData.children[0].userId);
       }
-    });
-  }, []);
+      setUser({
+        name: userData.name,
+        parentCode: userData.parentCode,
+      });
+    }
+  }, [userData]);
 
   // 자녀 카드들의 ref를 저장할 배열
   const cardContainerRef = useRef<HTMLDivElement>(null);

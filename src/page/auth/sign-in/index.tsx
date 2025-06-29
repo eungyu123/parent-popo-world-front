@@ -2,7 +2,7 @@
 // FCFCFC
 // FFD905
 
-import { data, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import apiClient from "../../../api/api";
@@ -17,7 +17,7 @@ interface SignInForm {
 export function SignInPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { setUser, setAccessToken, setChildren, selectedChildId, setSelectedChildId } = useAuthStore();
+  const { setUser, setAccessToken, setChildren, setSelectedChildId } = useAuthStore();
   const [formData, setFormData] = useState<SignInForm>({
     email: "",
     password: "",

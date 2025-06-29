@@ -5,6 +5,7 @@ import apiClient from "../../../api/api";
 import { ApiError } from "../../../api/api";
 import { useAuthStore } from "../../../zustand/auth";
 import { ConfirmModal } from "../../../features/quest/ConfirmModal";
+import { postPushMessage } from "../../../api/push/postPushMessage";
 
 const questStateMap: Record<string, Quest["state"]> = {
   PENDING_ACCEPT: "수락 전",
@@ -33,9 +34,7 @@ export const QuestListPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiClient.get(
-          `/api/quest/parent?childId=${selectedChildId}&type=${questType}`
-        );
+        const response = await apiClient.get(`/api/quest/parent?childId=${selectedChildId}&type=${questType}`);
         const data = await response.data;
         const mapped = data.quests.map((item: Quest) => ({
           ...item,
@@ -54,11 +53,7 @@ export const QuestListPage = () => {
   }, [questType, selectedChildId]);
 
   // 퀘스트 상태 변경 클릭
-  const handleChangeState = (
-    questId: string,
-    childId: string,
-    state: Quest["state"]
-  ) => {
+  const handleChangeState = (questId: string, childId: string, state: Quest["state"]) => {
     if (state !== "확인 요청") return;
     // 수락하기, 다 했어요 눌렀을 경우 모달창
     setIsModalOpen(true);
@@ -66,11 +61,7 @@ export const QuestListPage = () => {
   };
 
   // 상태 변경하기 api 요청
-  const proceedChangeState = async (
-    questId: string,
-    childId: string,
-    state: Quest["state"]
-  ) => {
+  const proceedChangeState = async (questId: string, childId: string, state: Quest["state"]) => {
     if (state !== "확인 요청") return;
 
     const body = { questId, childId, state: "APPROVED" };
@@ -78,11 +69,10 @@ export const QuestListPage = () => {
 
     try {
       await apiClient.post("/api/quest/state", body);
+      await postPushMessage({ childId, message: "부모님이 퀘스트를 확인했어!" });
 
       setQuestData((prev) =>
-        prev.map((quest) =>
-          quest.quest_id === questId ? { ...quest, state: "지급 대기" } : quest
-        )
+        prev.map((quest) => (quest.quest_id === questId ? { ...quest, state: "지급 대기" } : quest))
       );
     } catch (err) {
       if (err instanceof ApiError) {
@@ -98,25 +88,14 @@ export const QuestListPage = () => {
   // 모달창에서 확인 버튼 클릭
   const handleModalConfirm = () => {
     if (pendingChange) {
-      proceedChangeState(
-        pendingChange.questId,
-        pendingChange.childId,
-        pendingChange.state
-      );
+      proceedChangeState(pendingChange.questId, pendingChange.childId, pendingChange.state);
     }
     setPendingChange(null);
     setIsModalOpen(false);
   };
 
   const sortQuests = (quests: Quest[]) => {
-    const stateOrder: Quest["state"][] = [
-      "확인 요청",
-      "진행 중",
-      "수락 전",
-      "지급 대기",
-      "지급 완료",
-      "기간 만료",
-    ];
+    const stateOrder: Quest["state"][] = ["확인 요청", "진행 중", "수락 전", "지급 대기", "지급 완료", "기간 만료"];
 
     return quests.sort((a, b) => {
       const stateA = stateOrder.indexOf(a.state);
@@ -166,15 +145,9 @@ export const QuestListPage = () => {
             {stateFilterList.map(({ label, value, color }) => (
               <button
                 key={value}
-                onClick={() =>
-                  setSelectedState(value === selectedState ? "null" : value)
-                }
+                onClick={() => setSelectedState(value === selectedState ? "null" : value)}
                 className={`inline-block px-4 py-1 rounded-full text-sm font-medium transition
-                  ${
-                    selectedState === value
-                      ? `${color} text-white`
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                  }`}
+                  ${selectedState === value ? `${color} text-white` : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
               >
                 {label}
               </button>
@@ -188,8 +161,7 @@ export const QuestListPage = () => {
             !error &&
             (() => {
               const filteredQuests = questData.filter(
-                (quest) =>
-                  selectedState === "null" || quest.state === selectedState
+                (quest) => selectedState === "null" || quest.state === selectedState
               );
 
               if (filteredQuests.length === 0) {
@@ -204,32 +176,18 @@ export const QuestListPage = () => {
                 <QuestCard
                   key={quest.quest_id}
                   quest={quest}
-                  onChangeState={() =>
-                    handleChangeState(
-                      quest.quest_id,
-                      quest.child_id,
-                      quest.state
-                    )
-                  }
+                  onChangeState={() => handleChangeState(quest.quest_id, quest.child_id, quest.state)}
                 />
               ));
             })()}
 
-          {loading && (
-            <div className="text-center text-gray-500 mt-10">로딩 중...</div>
-          )}
-          {error && (
-            <div className="text-center text-red-500 mt-10">{error}</div>
-          )}
+          {loading && <div className="text-center text-gray-500 mt-10">로딩 중...</div>}
+          {error && <div className="text-center text-red-500 mt-10">{error}</div>}
         </div>
       </div>
 
       {/* 모달 */}
-      <ConfirmModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleModalConfirm}
-      />
+      <ConfirmModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleModalConfirm} />
     </>
   );
 };

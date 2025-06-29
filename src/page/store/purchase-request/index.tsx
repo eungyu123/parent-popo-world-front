@@ -5,6 +5,7 @@ import { useAuthStore } from "../../../zustand/auth";
 import { approveProduct } from "../../../api/market/approve-product";
 import Pagination from "../../../components/page/Pagination";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { postPushMessage } from "../../../api/push/postPushMessage";
 
 export const PurchaseRequestPage: React.FC = () => {
   const { selectedChildId } = useAuthStore();
@@ -25,6 +26,9 @@ export const PurchaseRequestPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["purchase-request", selectedChildId] });
       queryClient.invalidateQueries({ queryKey: ["purchase-management", selectedChildId] });
+      if (selectedChildId) {
+        postPushMessage({ childId: selectedChildId, message: "부모님이 상품 사용을 확인했어!" });
+      }
     },
   });
 
