@@ -3,6 +3,18 @@
 /* 데이지 UI 안쓸거임 삭제해야되는데 귀찮아서 안하는중 */
 @plugin "daisyui";
 
+/* 기본 색상 설정 - 다크모드 방지 */
+body {
+  color: #000000; /* 명시적으로 검은색 지정 */
+}
+
+/* 다크모드에서도 동일한 색상 유지 */
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #000000;
+  }
+}
+
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hidden {
   -ms-overflow-style: none; /* IE and Edge */
@@ -29,11 +41,6 @@ html::-webkit-scrollbar {
 
 #root::-webkit-scrollbar {
   display: none;
-}
-
-body {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
 
 body::-webkit-scrollbar {
