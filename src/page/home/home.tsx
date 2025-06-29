@@ -16,6 +16,7 @@ import savingsIcon from "../../assets/image/common/saving.png";
 import questIcon from "../../assets/image/common/quest.png";
 import { BottomNavBar } from "../../components/nav-bar/BottomNavBar";
 import { getUser } from "../../api/user/getUser";
+import { subscribe } from "../../utils/pushNotification";
 
 export const HomePage: React.FC = () => {
   const [isOpenParentCode, setIsOpenParentCode] = useState(false);
@@ -23,6 +24,10 @@ export const HomePage: React.FC = () => {
   const authData = authStorage ? JSON.parse(authStorage) : null;
   const parentCode = authData?.state?.user?.parentCode;
   const { child, setUser, setChildren, selectedChildId, setSelectedChildId } = useAuthStore();
+
+  useEffect(() => {
+    subscribe();
+  }, []);
 
   useEffect(() => {
     getUser().then((data) => {
