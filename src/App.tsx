@@ -37,25 +37,6 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const { setUser, setChildren, selectedChildId, setSelectedChildId } =
-    useAuthStore();
-
-  useEffect(() => {
-    getUser().then((data) => {
-      if (data) {
-        console.log("res.data", data.children);
-        setChildren(data.children);
-        setUser({
-          name: data.name,
-          parentCode: data.parentCode,
-        });
-        if (!selectedChildId) {
-          setSelectedChildId(data.children[0].userId);
-        }
-      }
-    });
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <Router>

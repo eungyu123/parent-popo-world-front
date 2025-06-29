@@ -2,7 +2,7 @@
 // FCFCFC
 // FFD905
 
-import { Link, useNavigate } from "react-router-dom";
+import { data, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import apiClient from "../../../api/api";
@@ -56,14 +56,14 @@ export function SignInPage() {
 
       // 사용자 정보 저장
       if (response.data) {
-        setChildren(response.data.children);
+        if (response.data.children && response.data.children.length > 0) {
+          setChildren(response.data.children);
+          setSelectedChildId(response.data.children[0].userId);
+        }
         setUser({
           name: response.data.name,
           parentCode: response.data.parentCode,
         });
-        if (!selectedChildId) {
-          setSelectedChildId(response.data.children[0].userId);
-        }
       }
 
       // 모든 캐시 무효화 (다른 사용자의 데이터가 남아있을 수 있으므로)

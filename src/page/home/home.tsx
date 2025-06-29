@@ -15,13 +15,29 @@ import storeIcon from "../../assets/image/common/store.png";
 import savingsIcon from "../../assets/image/common/saving.png";
 import questIcon from "../../assets/image/common/quest.png";
 import { BottomNavBar } from "../../components/nav-bar/BottomNavBar";
+import { getUser } from "../../api/user/getUser";
 
 export const HomePage: React.FC = () => {
   const [isOpenParentCode, setIsOpenParentCode] = useState(false);
   const authStorage = localStorage.getItem("auth-storage");
   const authData = authStorage ? JSON.parse(authStorage) : null;
   const parentCode = authData?.state?.user?.parentCode;
-  const { child, selectedChildId, setSelectedChildId } = useAuthStore();
+  const { child, setUser, setChildren, selectedChildId, setSelectedChildId } = useAuthStore();
+
+  useEffect(() => {
+    getUser().then((data) => {
+      if (data) {
+        if (data.children && data.children.length > 0) {
+          setChildren(data.children);
+          setSelectedChildId(data.children[0].userId);
+        }
+        setUser({
+          name: data.name,
+          parentCode: data.parentCode,
+        });
+      }
+    });
+  }, []);
 
   // 자녀 카드들의 ref를 저장할 배열
   const cardContainerRef = useRef<HTMLDivElement>(null);
