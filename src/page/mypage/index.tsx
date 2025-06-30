@@ -9,6 +9,7 @@ import type { Child } from "../../zustand/auth";
 
 export const MyPage: React.FC = () => {
   const [isOpenParentCode, setIsOpenParentCode] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const { logout, child, user } = useAuthStore();
 
   // user 정보를 any로 타입 단언하여 추가 속성에 접근
@@ -98,14 +99,80 @@ export const MyPage: React.FC = () => {
         </div>
       </Modal>
 
+      {/* 로그아웃 확인 모달 */}
+      <Modal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+      >
+        <div
+          className="flex flex-col gap-4 bg-white rounded-3xl p-6 w-72"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-2">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M16 17V14H9V10H16V7L21 12L16 17ZM14 2C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6H14V4H5V20H14V18H16V20C16 20.5304 15.7893 21.0391 15.4142 21.4142C15.0391 21.7893 14.5304 22 14 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V4C3 3.46957 3.21071 2.96086 3.58579 2.58579C3.96086 2.21071 4.46957 2 5 2H14Z"
+                  fill="#EF4444"
+                />
+              </svg>
+            </div>
+            <h2 className="text-lg font-bold text-gray-800">로그아웃</h2>
+            <p className="text-sm text-gray-500 text-center">
+              정말 로그아웃 하시겠습니까?
+            </p>
+            <div className="flex gap-2 w-full mt-2">
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  logout();
+                  setIsLogoutModalOpen(false);
+                }}
+                className="flex-1 px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
       <div className="min-h-screen bg-gray-50">
-        <div className="bg-white">
+        <div className="bg-white relative">
+          <button
+            onClick={() => setIsLogoutModalOpen(true)}
+            className="absolute right-4 top-3 flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16 17V14H9V10H16V7L21 12L16 17ZM14 2C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6H14V4H5V20H14V18H16V20C16 20.5304 15.7893 21.0391 15.4142 21.4142C15.0391 21.7893 14.5304 22 14 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V4C3 3.46957 3.21071 2.96086 3.58579 2.58579C3.96086 2.21071 4.46957 2 5 2H14Z"
+                fill="currentColor"
+              />
+            </svg>
+            <span>로그아웃</span>
+          </button>
           {/* 헤더 */}
           <div className="px-6 py-4">
             <h1 className="text-2xl font-bold text-gray-800 mb-2">
               마이페이지
             </h1>
-            <p className="text-gray-600">계정 정보와 설정을 관리하세요</p>
           </div>
 
           {/* 프로필 섹션 */}
@@ -156,7 +223,6 @@ export const MyPage: React.FC = () => {
                   </div>
                 )}
               </div>
-
             </div>
           </div>
         </div>
@@ -198,7 +264,7 @@ export const MyPage: React.FC = () => {
         </div>
 
         {/* 빠른 메뉴 */}
-        <div className="px-6 py-6">
+        <div className="px-6 py-6 mb-[-1rem]">
           <h3 className="text-lg font-bold text-gray-800 mb-4">빠른 메뉴</h3>
           <div className="grid grid-cols-2 gap-3">
             {quickMenus.map((menu) => (
@@ -213,31 +279,6 @@ export const MyPage: React.FC = () => {
                 <p className="text-xs text-gray-600">{menu.description}</p>
               </Link>
             ))}
-          </div>
-        </div>
-
-        {/* 설정 섹션 */}
-        <div className="px-6 py-6 mb-[-1rem]">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">설정</h3>
-          <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-            <button className="w-full px-4 py-4 text-left hover:bg-gray-50 transition-colors border-b border-gray-100">
-              <span className="font-medium text-gray-800">알림 설정</span>
-            </button>
-            <button className="w-full px-4 py-4 text-left hover:bg-gray-50 transition-colors border-b border-gray-100">
-              <span className="font-medium text-gray-800">도움말</span>
-            </button>
-            <button className="w-full px-4 py-4 text-left hover:bg-gray-50 transition-colors border-b border-gray-100">
-              <span className="font-medium text-gray-800">앱 정보</span>
-            </button>
-            <button
-              onClick={() => {
-                console.log("로그아웃");
-                logout();
-              }}
-              className="w-full px-4 py-4 text-left hover:bg-red-50 transition-colors text-red-600 font-medium"
-            >
-              로그아웃
-            </button>
           </div>
         </div>
       </div>
