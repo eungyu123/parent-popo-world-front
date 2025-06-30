@@ -6,6 +6,8 @@ import { ApiError } from "../../../api/api";
 import { useAuthStore } from "../../../zustand/auth";
 import { ConfirmModal } from "../../../features/quest/ConfirmModal";
 import { postPushMessage } from "../../../api/push/postPushMessage";
+import { getQuest } from "../../../api/quest/getQuest";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const questStateMap: Record<string, Quest["state"]> = {
   PENDING_ACCEPT: "수락 전",
@@ -30,27 +32,34 @@ export const QuestListPage = () => {
   } | null>(null);
   const { selectedChildId } = useAuthStore();
 
+  const queryClient = useQueryClient();
+
+  const {
+    data: _questData,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["quest", selectedChildId, questType],
+    queryFn: () => getQuest(selectedChildId || "", questType),
+    enabled: !!selectedChildId && !!questType,
+  });
+
   // 퀘스트 조회
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await apiClient.get(`/api/quest/parent?childId=${selectedChildId}&type=${questType}`);
-        const data = await response.data;
-        const mapped = data.quests.map((item: Quest) => ({
-          ...item,
-          state: questStateMap[item.state],
-        }));
-        const sorted = sortQuests(mapped);
-        setQuestData(sorted);
-      } catch (err) {
-        setError("퀘스트 불러오기 실패: " + err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [questType, selectedChildId]);
+    if (isLoading || isError || !_questData) return;
+    try {
+      const mapped = _questData.quests.map((item: Quest) => ({
+        ...item,
+        state: questStateMap[item.state],
+      }));
+      const sorted = sortQuests(mapped);
+      setQuestData(sorted);
+    } catch (err) {
+      setError("퀘스트 불러오기 실패: " + err);
+    } finally {
+      setLoading(false);
+    }
+  }, [questType, selectedChildId, _questData]);
 
   // 퀘스트 상태 변경 클릭
   const handleChangeState = (questId: string, childId: string, state: Quest["state"]) => {
@@ -63,12 +72,11 @@ export const QuestListPage = () => {
   // 상태 변경하기 api 요청
   const proceedChangeState = async (questId: string, childId: string, state: Quest["state"]) => {
     if (state !== "확인 요청") return;
-
     const body = { questId, childId, state: "APPROVED" };
-    console.log("상태 변경 요청 body:", body);
 
     try {
       await apiClient.post("/api/quest/state", body);
+      queryClient.invalidateQueries({ queryKey: ["quest", selectedChildId, questType] });
       await postPushMessage({ childId, message: "부모님이 퀘스트를 확인했어!" });
 
       setQuestData((prev) =>
@@ -113,7 +121,7 @@ export const QuestListPage = () => {
     { label: "지급 완료", value: "지급 완료", color: "bg-purple-300" },
     { label: "기간 만료", value: "기간 만료", color: "bg-orange-300" },
   ];
-
+  // prettier-ignore
   return (
     <>
       {/* 퀘스트 유형 토글 버튼 */}
@@ -157,8 +165,7 @@ export const QuestListPage = () => {
 
         {/* 스크롤 되는 부분: 퀘스트 카드 리스트만 */}
         <div className="h-[29rem] overflow-y-scroll scrollbar-hidden space-y-3">
-          {!loading &&
-            !error &&
+          {!loading && !isLoading && !isError && !error &&
             (() => {
               const filteredQuests = questData.filter(
                 (quest) => selectedState === "null" || quest.state === selectedState
@@ -181,8 +188,8 @@ export const QuestListPage = () => {
               ));
             })()}
 
-          {loading && <div className="text-center text-gray-500 mt-10">로딩 중...</div>}
-          {error && <div className="text-center text-red-500 mt-10">{error}</div>}
+          {loading || (isLoading && <div className="text-center text-gray-500 mt-10">로딩 중...</div>)}
+          {error || (isError && <div className="text-center text-red-500 mt-10">{error}</div>)}
         </div>
       </div>
 

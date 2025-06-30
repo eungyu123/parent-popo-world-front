@@ -41,7 +41,11 @@ export function SignInPage() {
     const handleSubscribe = async () => {
       if (accessToken) {
         try {
-          await subscribe();
+          if (Notification.permission === "granted") {
+            await subscribe();
+          } else {
+            alert("알림 권한이 거부되었습니다. 브라우저 알림을 허용해주세요");
+          }
           if (isAuthenticated) {
             navigate("/");
           }
@@ -98,9 +102,6 @@ export function SignInPage() {
 
       // 모든 캐시 무효화 (다른 사용자의 데이터가 남아있을 수 있으므로)
       queryClient.clear();
-
-      // 메인 페이지로 이동
-      navigate("/");
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
@@ -110,50 +111,52 @@ export function SignInPage() {
   };
 
   return (
-    <div className="flex flex-col justify-center px-6 py-10 bg-white rounded-3xl mt-31 scrollbar-hidden">
-      <h3 className="mb-6 text-2xl font-bold text-[#5E2B00] text-center">POPO WORLD</h3>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-1">
-          <label className="text-[#5E2B00] font-bold">이메일</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full h-10 border border-[#5E2B00] rounded-lg p-2"
-            placeholder="이메일을 입력해주세요"
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-[#5E2B00] font-bold">비밀번호</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full h-10 border border-[#5E2B00] rounded-lg p-2"
-            placeholder="비밀번호를 입력해주세요"
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-4 mt-4">
-          <button
-            type="submit"
-            className="w-full h-10 bg-[#FFD905] text-white font-bold rounded-lg active:scale-95 transition-all duration-100"
-          >
-            로그인
-          </button>
-          <Link to="/auth/sign-up">
+    <>
+      <div className="flex flex-col justify-center px-6 py-10 bg-white rounded-3xl mt-31 scrollbar-hidden">
+        <h3 className="mb-6 text-2xl font-bold text-[#5E2B00] text-center">POPO WORLD</h3>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-1">
+            <label className="text-[#5E2B00] font-bold">이메일</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full h-10 border border-[#5E2B00] rounded-lg p-2"
+              placeholder="이메일을 입력해주세요"
+              required
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[#5E2B00] font-bold">비밀번호</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full h-10 border border-[#5E2B00] rounded-lg p-2"
+              placeholder="비밀번호를 입력해주세요"
+              required
+            />
+          </div>
+          <div className="flex flex-col gap-4 mt-4">
             <button
-              type="button"
-              className="w-full h-10 bg-[#ADCF00] text-white font-bold rounded-lg active:scale-95 transition-all duration-100"
+              type="submit"
+              className="w-full h-10 bg-[#FFD905] text-white font-bold rounded-lg active:scale-95 transition-all duration-100"
             >
-              회원가입
+              로그인
             </button>
-          </Link>
-        </div>
-      </form>
-    </div>
+            <Link to="/auth/sign-up">
+              <button
+                type="button"
+                className="w-full h-10 bg-[#ADCF00] text-white font-bold rounded-lg active:scale-95 transition-all duration-100"
+              >
+                회원가입
+              </button>
+            </Link>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

@@ -6,6 +6,7 @@ import { Modal } from "../../../components/modal/Modal";
 import { CategoryDropdown } from "../../../features/quest/CategoryDropdown";
 import { IMAGE_URLS } from "../../../constants/constants";
 import { postPushMessage } from "../../../api/push/postPushMessage";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const CreateQuestPage = () => {
   const [name, setName] = useState("");
@@ -18,7 +19,7 @@ export const CreateQuestPage = () => {
   const [isInputMissing, setIsInputMissing] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const { selectedChildId } = useAuthStore();
-
+  const queryClient = useQueryClient();
   const handleCreateQuest = async () => {
     if (!name || !description || !deadline || reward === "" || !label) {
       setIsInputMissing(true);
@@ -55,7 +56,7 @@ export const CreateQuestPage = () => {
       await apiClient.post("/api/quest/create", body);
       console.log("퀘스트 생성 성공:", body);
       await postPushMessage({ childId: selectedChildId ?? "", message: "부모님이 퀘스트를 내주셨어" });
-
+      queryClient.invalidateQueries({ queryKey: ["quest", selectedChildId, "parent"] });
       setShowCompleteModal(true);
 
       setName("");
