@@ -6,6 +6,7 @@ import SavingsCard from "../../../features/savings/SavingsCard";
 import NavigationButton from "../../../features/savings/NavigationButton";
 import { useAuthStore } from "../../../zustand/auth";
 import xpopo from "../../../assets/image/common/x_popo.png";
+import { useQuery } from "@tanstack/react-query";
 // 날짜 포맷 변환 함수
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -17,33 +18,24 @@ const formatDate = (dateString: string) => {
 export const SavingsReportPage: React.FC = () => {
   const [savingsAccounts, setSavingsAccounts] = useState<SavingsAccount[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const { selectedChildId } = useAuthStore();
 
+  // prettier-ignore
+  const {data: accounts, isLoading, error} = useQuery<SavingsAccount[]>({
+    queryKey: ["savingsAccounts", selectedChildId],
+    queryFn: () => fetchSavingsAccounts(selectedChildId || ""),
+    enabled: !!selectedChildId,
+  });
+
   useEffect(() => {
-    if (!selectedChildId) return;
-
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const accounts = await fetchSavingsAccounts(selectedChildId);
-        // 최신순으로 정렬
-        const sortedAccounts = accounts.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
-        setSavingsAccounts(sortedAccounts);
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-        setError("저축통장 정보를 불러오는데 실패했습니다.");
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-    // 새로운 자녀가 선택되면 currentIndex를 0으로 초기화
-    setCurrentIndex(0);
-  }, [selectedChildId]);
+    if (accounts) {
+      // 최신순으로 정렬
+      const sortedAccounts = accounts?.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
+      setSavingsAccounts(sortedAccounts);
+      setCurrentIndex(0);
+    }
+  }, [savingsAccounts]);
 
   if (!selectedChildId) {
     return <div className="flex justify-center items-center flex-1 text-gray-500">자녀를 선택해주세요.</div>;
@@ -56,8 +48,10 @@ export const SavingsReportPage: React.FC = () => {
   if (error || savingsAccounts.length === 0) {
     return (
       <>
-      <img src={xpopo} alt="xpopo" className="w-50 h-60 mx-auto ml-20 mt-10 mb-10" />
-      <div className="flex justify-center items-center flex-1 text-lg font-bold">{error || "데이터가 존재하지 않습니다."}</div>
+        <img src={xpopo} alt="xpopo" className="w-50 h-60 mx-auto ml-20 mt-10 mb-10" />
+        <div className="flex justify-center items-center flex-1 text-lg font-bold">
+          {error instanceof Error ? error.message : "데이터가 존재하지 않습니다."}
+        </div>
       </>
     );
   }

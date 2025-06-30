@@ -11,17 +11,17 @@ const PushNotificationProvider = ({ queryClient }: PushNotificationProviderProps
     // 서비스 워커로부터 메시지 수신
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === "PUSH_NOTIFICATION_RECEIVED") {
+        queryClient.invalidateQueries({ queryKey: ["user"] });
         if (event.data.data.includes("퀘스트")) {
           queryClient.invalidateQueries({ queryKey: ["quest"] });
         }
-        // 상품
         if (event.data.data.includes("상품")) {
           queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
           queryClient.invalidateQueries({ queryKey: ["purchase-management"] });
           queryClient.invalidateQueries({ queryKey: ["storeItems"] });
         }
-        if (event.data.data.includes("자녀")) {
-          queryClient.invalidateQueries({ queryKey: ["user"] });
+        if (event.data.data.includes("통장")) {
+          queryClient.invalidateQueries({ queryKey: ["savingsAccounts"] });
         }
       }
     };

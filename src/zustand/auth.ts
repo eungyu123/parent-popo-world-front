@@ -6,6 +6,7 @@
  */
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { logoutUser } from "../api/user/logoutUser";
 
 export interface Child {
   name: string;
@@ -22,6 +23,7 @@ interface AuthState {
   user: {
     name: string; // 이름
     parentCode: string; // 부모 코드
+    parentEmail: string; // 이메일
   } | null;
   child: Child[];
   parentCode: string | null;
@@ -58,7 +60,7 @@ const INITIAL_AUTH_STATE: AuthState = {
  */
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...INITIAL_AUTH_STATE,
       // 사용자 정보 설정 액션
       setUser: (user) =>
@@ -67,7 +69,11 @@ export const useAuthStore = create<AuthStore>()(
           isAuthenticated: true, // 사용자 정보가 있으면 인증 상태를 true로 설정
         }),
       // 로그아웃 액션
-      logout: () => set(INITIAL_AUTH_STATE),
+      logout: async () => {
+        const { user } = get();
+        if (user?.parentEmail) await logoutUser(user.parentEmail);
+        set(INITIAL_AUTH_STATE);
+      },
       // Access Token 설정 액션
       setAccessToken: (token: string) => set({ accessToken: token }),
       // Child 설정 액션

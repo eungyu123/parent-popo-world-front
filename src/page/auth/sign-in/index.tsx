@@ -3,11 +3,12 @@
 // FFD905
 
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import apiClient from "../../../api/api";
 import { useAuthStore } from "../../../zustand/auth";
 import Cookies from "js-cookie";
+import { subscribe } from "../../../utils/pushNotification";
 
 interface SignInForm {
   email: string;
@@ -17,12 +18,40 @@ interface SignInForm {
 export function SignInPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { setUser, setAccessToken, setChildren, setSelectedChildId } = useAuthStore();
+  const { setUser, setAccessToken, setChildren, setSelectedChildId, accessToken, isAuthenticated } = useAuthStore();
   const [formData, setFormData] = useState<SignInForm>({
     email: "",
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const handlePermission = async () => {
+      // 1. 브라우저에 알림 권한 요청
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        console.log("알림 권한이 거부되었습니다.");
+        return;
+      }
+    };
+    handlePermission();
+  }, []);
+
+  useEffect(() => {
+    const handleSubscribe = async () => {
+      if (accessToken) {
+        try {
+          await subscribe();
+          if (isAuthenticated) {
+            navigate("/");
+          }
+        } catch (error) {
+          console.error("푸시 알림 구독 실패:", error);
+        }
+      }
+    };
+    handleSubscribe();
+  }, [accessToken, isAuthenticated]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -63,6 +92,7 @@ export function SignInPage() {
         setUser({
           name: response.data.name,
           parentCode: response.data.parentCode,
+          parentEmail: formData.email,
         });
       }
 
