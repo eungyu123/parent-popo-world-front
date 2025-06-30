@@ -54,6 +54,8 @@ export const PurchaseManagementPage: React.FC = () => {
       status: "구매완료",
       updatedAt: item.purchasedAt,
     }));
+    console.log("updatedPendingApprove", updatedPendingApprove);
+    console.log("updatedInventory", updatedInventory);
 
     const allItems = [...updatedApproveHistory, ...updatedPendingApprove, ...updatedInventory];
     allItems.sort((a, b) => {
@@ -178,7 +180,7 @@ export const PurchaseManagementPage: React.FC = () => {
       </div>
       {/* 구매 건수 리스트 */}
       <div className="flex flex-col gap-y-8 ">
-        {/* 구매요청 리스트 */}
+        {/* 아이템 리스트 */}
         {currentItems.map((item) => (
           <div className="relative flex justify-between items-center ">
             {/* 왼쪽 */}
@@ -196,7 +198,7 @@ export const PurchaseManagementPage: React.FC = () => {
             </div>
             {/* 오른쪽 */}
             <div className="flex gap-x-2 items-center">
-              <div className="text-xs text-gray-700 px-2 py-1 bg-gray-200 rounded-md">{item.usedAt}</div>
+              <div className="text-xs text-gray-700 px-2 py-1 bg-gray-200 rounded-md">{item.updatedAt}</div>
               <div
                 className="text-xs text-main-white-500 rounded-sm px-2 py-1"
                 style={{ backgroundColor: PURCHASE_STATUS[item.status as keyof typeof PURCHASE_STATUS] }}
