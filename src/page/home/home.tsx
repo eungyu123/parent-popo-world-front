@@ -24,7 +24,7 @@ export const HomePage: React.FC = () => {
   const authStorage = localStorage.getItem("auth-storage");
   const authData = authStorage ? JSON.parse(authStorage) : null;
   const parentCode = authData?.state?.user?.parentCode;
-  const { child, setUser, setChildren, selectedChildId, setSelectedChildId } = useAuthStore();
+  const { child, user, setUser, setChildren, selectedChildId, setSelectedChildId } = useAuthStore();
 
   useEffect(() => {
     subscribe();
@@ -44,6 +44,7 @@ export const HomePage: React.FC = () => {
       setUser({
         name: userData.name,
         parentCode: userData.parentCode,
+        parentEmail: user?.parentEmail || "",
       });
     }
   }, [userData]);
