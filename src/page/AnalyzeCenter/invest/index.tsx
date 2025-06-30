@@ -56,11 +56,8 @@ export const investTypes: Record<string, { title: string; color: string }> = {
 };
 
 export const InvestAnalyzePage: React.FC = () => {
-  const [selectedAnalyzeType, setSelectedAnalyzeType] =
-    useState<string>("avg_stay_time");
-  const [selectedAnalyzePeriod, setSelectedAnalyzePeriod] = useState<
-    "all" | "week"
-  >("all");
+  const [selectedAnalyzeType, setSelectedAnalyzeType] = useState<string>("avg_stay_time");
+  const [selectedAnalyzePeriod, setSelectedAnalyzePeriod] = useState<"all" | "week">("all");
   const { selectedChildId } = useAuthStore();
 
   const {
@@ -75,20 +72,14 @@ export const InvestAnalyzePage: React.FC = () => {
     | BettingSuccessGraphProps[]
     | BalanceTrendGraphProps[]
   >({
-    queryKey: [
-      "investAnalyze",
-      selectedAnalyzeType,
-      selectedAnalyzePeriod,
-      selectedChildId,
-    ],
+    queryKey: ["investAnalyze", selectedAnalyzeType, selectedAnalyzePeriod, selectedChildId],
     queryFn: () =>
       getInvestAnalyze({
         graph: selectedAnalyzeType,
         range: selectedAnalyzePeriod,
         selectedChildId: selectedChildId || "",
       }),
-    enabled:
-      !!selectedAnalyzeType && !!selectedAnalyzePeriod && !!selectedChildId,
+    enabled: !!selectedAnalyzeType && !!selectedAnalyzePeriod && !!selectedChildId,
     staleTime: 1000 * 60 * 60, // 그래프는 데이터 받는데 오래걸리기도하고 게임 데이터 분석이 실시간반영이 안되서 길게둠
   });
 
@@ -103,20 +94,14 @@ export const InvestAnalyzePage: React.FC = () => {
               key={index}
               className="px-2 py-1 text-main-white-500 rounded-sm text-xs whitespace-nowrap"
               style={{ backgroundColor: investType.color }}
-              onClick={() =>
-                setSelectedAnalyzeType(key as keyof typeof investTypes)
-              }
+              onClick={() => setSelectedAnalyzeType(key as keyof typeof investTypes)}
             >
               {investType.title}
             </div>
           ))}
         </div>
         <div className="flex flex-col justify-center items-center h-full">
-          <img
-            src={wait_popo}
-            alt="wait_popo"
-            className="w-40 mt-10 mb-6 ml-5"
-          />
+          <img src={wait_popo} alt="wait_popo" className="w-40 mt-10 mb-6 ml-5" />
           <div className="text-base font-bold ">데이터를 분석중입니다 ...</div>
         </div>
       </>
@@ -128,7 +113,7 @@ export const InvestAnalyzePage: React.FC = () => {
   }
 
   const AnalyzeGraph = () => {
-    if (investAnalyzeData.length === 0) {
+    if (!investAnalyzeData.length || !investAnalyzeData || investAnalyzeData.length <= 0) {
       return (
         <div className="flex flex-col justify-center items-center h-full">
           <img src={x_popo} alt="x_popo" className="w-32 mt-10 mb-6" />
@@ -139,46 +124,22 @@ export const InvestAnalyzePage: React.FC = () => {
 
     if (selectedAnalyzeType === "avg_stay_time") {
       // 체류시간
-      return (
-        <StayTimeGraph
-          StayTimeData={investAnalyzeData as StayTimeGraphProps[]}
-        />
-      );
+      return <StayTimeGraph StayTimeData={investAnalyzeData as StayTimeGraphProps[]} />;
     } else if (selectedAnalyzeType === "buy_ratio") {
       // 구매 판매 비율
-      return (
-        <TradingRatioGraph1
-          TradingRatioData={investAnalyzeData as TradingRatioGraph1Props[]}
-        />
-      );
+      return <TradingRatioGraph1 TradingRatioData={investAnalyzeData as TradingRatioGraph1Props[]} />;
     } else if (selectedAnalyzeType === "sell_ratio") {
       // 구매 판매 비율
-      return (
-        <TradingRatioGraph2
-          TradingRatioData={investAnalyzeData as TradingRatioGraph2Props[]}
-        />
-      );
+      return <TradingRatioGraph2 TradingRatioData={investAnalyzeData as TradingRatioGraph2Props[]} />;
     } else if (selectedAnalyzeType === "buy_sell_ratio") {
       // 구매 판매 비율
-      return (
-        <TradingRatioGraph3
-          TradingRatioData={investAnalyzeData as TradingRatioGraph3Props[]}
-        />
-      );
+      return <TradingRatioGraph3 TradingRatioData={investAnalyzeData as TradingRatioGraph3Props[]} />;
     } else if (selectedAnalyzeType === "bet_ratio") {
       // 배팅 성공률
-      return (
-        <BettingSuccessGraph
-          BettingSuccessData={investAnalyzeData as BettingSuccessGraphProps[]}
-        />
-      );
+      return <BettingSuccessGraph BettingSuccessData={investAnalyzeData as BettingSuccessGraphProps[]} />;
     } else if (selectedAnalyzeType === "avg_cash_ratio") {
       // 여유자금 추이
-      return (
-        <BalanceTrendGraph
-          BalanceTrendData={investAnalyzeData as BalanceTrendGraphProps[]}
-        />
-      );
+      return <BalanceTrendGraph BalanceTrendData={investAnalyzeData as BalanceTrendGraphProps[]} />;
     }
   };
 
@@ -192,9 +153,7 @@ export const InvestAnalyzePage: React.FC = () => {
             key={index}
             className="px-2 py-1 text-main-white-500 rounded-sm text-xs whitespace-nowrap"
             style={{ backgroundColor: investType.color }}
-            onClick={() =>
-              setSelectedAnalyzeType(key as keyof typeof investTypes)
-            }
+            onClick={() => setSelectedAnalyzeType(key as keyof typeof investTypes)}
           >
             {investType.title}
           </div>
@@ -215,10 +174,7 @@ export const InvestAnalyzePage: React.FC = () => {
                 selectedAnalyzePeriod === period.value ? "bg-white shadow" : ""
               }`}
               style={{
-                color:
-                  selectedAnalyzePeriod === period.value
-                    ? investTypes[selectedAnalyzeType].color
-                    : "#99a1af",
+                color: selectedAnalyzePeriod === period.value ? investTypes[selectedAnalyzeType].color : "#99a1af",
               }}
               onClick={() => setSelectedAnalyzePeriod(period.value)}
             >
@@ -231,9 +187,7 @@ export const InvestAnalyzePage: React.FC = () => {
       {AnalyzeGraph()}
 
       {/* 아래 선 부모 패딩 좌 2rem, 우 2rem 계산후 반영 */}
-      {investAnalyzeData.length > 0 && (
-        <div className="my-6 -ml-8 w-[calc(100%_+_4rem)] h-[0.0625rem] bg-gray-200 " />
-      )}
+      {investAnalyzeData.length > 0 && <div className="my-6 -ml-8 w-[calc(100%_+_4rem)] h-[0.0625rem] bg-gray-200 " />}
 
       {/* 분석 결과 */}
     </>

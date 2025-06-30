@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
     },
   },
 });
@@ -45,39 +45,39 @@ function App() {
             <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
             {/* prettier-ignore */}
             <Route path="/" element={<ProtectedRoute><BaseLayout /></ProtectedRoute>}>
-            {/* 상점 */}
-            <Route path="/store" element={<StoreLayout />}>
-              <Route path="product-management" element={<ProductManagementPage />} />
-              <Route path="purchase-management" element={<PurchaseManagementPage />} />
-              <Route path="purchase-request" element={<PurchaseRequestPage />} />
+              {/* 상점 */}
+              <Route path="/store" element={<StoreLayout />}>
+                <Route path="product-management" element={<ProductManagementPage />} />
+                <Route path="purchase-management" element={<PurchaseManagementPage />} />
+                <Route path="purchase-request" element={<PurchaseRequestPage />} />
+              </Route>
+
+              {/* 모의투자 */}
+              <Route path="/invest/scenario-select" element={<InvestScenarioSelectPage />} />
+              <Route path="/invest/chat-bot" element={<InvestAnalyzePage />} />
+
+              {/* 퀘스트 */}
+              <Route path="/quest" element={<QuestLayout />}>
+                <Route path="create-quest" element={<CreateQuestPage />} />
+                <Route path="quest-list" element={<QuestListPage/>}/>
+              </Route>
+
+              {/* 분석센터 */}
+              <Route path="/analyze" element={<AnalyzeCenterLayout />}>
+                <Route index element={<AnalyzeCenterPage />} />
+                <Route path="invest" element={<InvestAnalyzePage />} />
+                <Route path="store" element={<ProductAnalyzePage />} />
+                <Route path="quest" element={<AnalyzeQuestPage/>}/>
+              </Route>
+
+              {/* 저축 리포트 */}
+              <Route path="/savings" element={<SavingsLayout />}>
+                <Route path="report" element={<SavingsReportPage />} />
+              </Route>
+
+              {/* 마이페이지 */}
+              <Route path="/mypage" element={<MyPage />} />
             </Route>
-
-            {/* 모의투자 */}
-            <Route path="/invest/scenario-select" element={<InvestScenarioSelectPage />} />
-            <Route path="/invest/chat-bot" element={<InvestAnalyzePage />} />
-
-            {/* 퀘스트 */}
-            <Route path="/quest" element={<QuestLayout />}>
-              <Route path="create-quest" element={<CreateQuestPage />} />
-              <Route path="quest-list" element={<QuestListPage/>}/>
-            </Route>
-
-            {/* 분석센터 */}
-            <Route path="/analyze" element={<AnalyzeCenterLayout />}>
-              <Route index element={<AnalyzeCenterPage />} />
-              <Route path="invest" element={<InvestAnalyzePage />} />
-              <Route path="store" element={<ProductAnalyzePage />} />
-              <Route path="quest" element={<AnalyzeQuestPage/>}/>
-            </Route>
-
-            {/* 저축 리포트 */}
-            <Route path="/savings" element={<SavingsLayout />}>
-              <Route path="report" element={<SavingsReportPage />} />
-            </Route>
-
-            {/* 마이페이지 */}
-            <Route path="/mypage" element={<MyPage />} />
-          </Route>
 
             {/* 로그인, 회원가입 */}
             <Route path="/auth" element={<AuthLayout />}>

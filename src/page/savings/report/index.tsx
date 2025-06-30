@@ -7,6 +7,7 @@ import NavigationButton from "../../../features/savings/NavigationButton";
 import { useAuthStore } from "../../../zustand/auth";
 import xpopo from "../../../assets/image/common/x_popo.png";
 import { useQuery } from "@tanstack/react-query";
+
 // 날짜 포맷 변환 함수
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -32,10 +33,11 @@ export const SavingsReportPage: React.FC = () => {
     if (accounts) {
       // 최신순으로 정렬
       const sortedAccounts = accounts?.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
+      console.log(sortedAccounts);
       setSavingsAccounts(sortedAccounts);
       setCurrentIndex(0);
     }
-  }, [savingsAccounts]);
+  }, [accounts]);
 
   if (!selectedChildId) {
     return <div className="flex justify-center items-center flex-1 text-gray-500">자녀를 선택해주세요.</div>;

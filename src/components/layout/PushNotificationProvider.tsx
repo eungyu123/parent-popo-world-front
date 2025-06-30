@@ -12,16 +12,27 @@ const PushNotificationProvider = ({ queryClient }: PushNotificationProviderProps
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === "PUSH_NOTIFICATION_RECEIVED") {
         queryClient.invalidateQueries({ queryKey: ["user"] });
+
+        // 퀘스트 데이터 갱신
         if (event.data.data.includes("퀘스트")) {
           queryClient.invalidateQueries({ queryKey: ["quest"] });
         }
+
+        // 상품 데이터 갱신
         if (event.data.data.includes("상품")) {
           queryClient.invalidateQueries({ queryKey: ["purchase-request"] });
           queryClient.invalidateQueries({ queryKey: ["purchase-management"] });
           queryClient.invalidateQueries({ queryKey: ["storeItems"] });
         }
+
+        // 통장 데이터 갱신
         if (event.data.data.includes("통장")) {
           queryClient.invalidateQueries({ queryKey: ["savingsAccounts"] });
+        }
+
+        // 분석데이터 갱신
+        if (event.data.data.includes("게임")) {
+          queryClient.invalidateQueries({ queryKey: ["investAnalyze"] });
         }
       }
     };
